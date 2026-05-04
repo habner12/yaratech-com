@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YaraTech — Tecnología desde Caranavi, Bolivia</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   VARIABLES & RESET
+═══════════════════════════════════════════ */
+:root {
+  --lime:    #C8F135;
+  --lime-dk: #A8CC1A;
+  --lime-lt: #E4FA8A;
+  --dark:    #0B0E0B;
+  --dark2:   #111511;
+  --dark3:   #181D17;
+  --panel:   #1E251D;
+  --panel2:  #242C23;
+  --border:  rgba(200,241,53,0.12);
+  --border2: rgba(255,255,255,0.06);
+  --text:    #F0F5E8;
+  --muted:   #8A9680;
+  --dim:     #5A6354;
+  --white:   #ffffff;
+  --wa:      #25D366;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--dark);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--dark2); }
+::-webkit-scrollbar-thumb { background: var(--lime-dk); border-radius: 3px; }
+
+/* ═══════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════ */
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:200;
+  height: 68px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 60px;
+  background: rgba(11,14,11,0.80);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 24px;
+  letter-spacing: -1px;
+  color: var(--text);
+  text-decoration: none;
+}
+.logo span { color: var(--lime); }
+.logo sub {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: 1px;
+  vertical-align: middle;
+  margin-left: 6px;
+  font-family: 'Outfit', sans-serif;
+}
+.nav-links {
+  display: flex; align-items: center; gap: 4px;
+}
+.nav-links a {
+  font-size: 14px; font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+.nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-wa {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--wa);
+  color: #fff !important;
+  font-weight: 600 !important;
+  padding: 9px 20px !important;
+  border-radius: 50px !important;
+  font-size: 14px !important;
+  transition: all 0.2s !important;
+}
+.nav-wa:hover { background: #1da851 !important; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(37,211,102,0.3) !important; }
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+#inicio {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 68px 60px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Fondo animado */
+.hero-bg {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+}
+.hero-bg::before {
+  content:'';
+  position: absolute;
+  width: 700px; height: 700px;
+  background: radial-gradient(ellipse, rgba(200,241,53,0.08) 0%, transparent 65%);
+  right: -100px; top: 50px;
+  animation: floatBlob 8s ease-in-out infinite;
+}
+.hero-bg::after {
+  content:'';
+  position: absolute;
+  width: 400px; height: 400px;
+  background: radial-gradient(ellipse, rgba(200,241,53,0.05) 0%, transparent 65%);
+  left: 10%; bottom: 10%;
+  animation: floatBlob 11s ease-in-out infinite reverse;
+}
+@keyframes floatBlob {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(30px,-40px) scale(1.08); }
+}
+
+/* Cuadrícula de fondo sutil */
+.hero-grid {
+  position: absolute; inset:0; pointer-events:none; z-index:0;
+  background-image:
+    linear-gradient(rgba(200,241,53,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,241,53,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 60% 40%, black 30%, transparent 100%);
+}
+
+.hero-left {
+  position: relative; z-index:1;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 80px 0 80px;
+}
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(200,241,53,0.08);
+  border: 1px solid rgba(200,241,53,0.25);
+  color: var(--lime);
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 7px 18px; border-radius: 100px;
+  margin-bottom: 32px;
+  width: fit-content;
+}
+.hero-tag::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--lime); animation: blink 2s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.hero-h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(48px, 6vw, 82px);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -3px;
+  margin-bottom: 28px;
+}
+.hero-h1 .hl {
+  color: var(--lime);
+  display: block;
+}
+.hero-h1 .dim-word { color: var(--muted); }
+
+.hero-p {
+  font-size: 17px; color: var(--muted); line-height: 1.8;
+  max-width: 440px; margin-bottom: 44px;
+}
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.btn-lime {
+  background: var(--lime);
+  color: var(--dark);
+  font-family: 'Syne', sans-serif;
+  font-weight: 700; font-size: 15px;
+  padding: 14px 30px; border-radius: 50px;
+  text-decoration: none; border:none; cursor:pointer;
+  transition: all 0.25s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-lime:hover { background: var(--lime-dk); transform: translateY(-2px); box-shadow: 0 12px 32px rgba(200,241,53,0.25); }
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  font-weight: 500; font-size: 15px;
+  padding: 14px 30px; border-radius: 50px;
+  text-decoration: none;
+  border: 1px solid var(--border2);
+  transition: all 0.2s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); }
+
+.hero-right {
+  position: relative; z-index:1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 68px 0 40px;
+}
+
+/* Tarjeta de producto flotante */
+.hero-device {
+  position: relative;
+  width: 100%; max-width: 440px;
+}
+.device-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.device-card::before {
+  content:'';
+  position: absolute; top:-1px; left: 40px; right:40px; height:2px;
+  background: linear-gradient(90deg, transparent, var(--lime), transparent);
+}
+.device-screen {
+  background: var(--dark2);
+  border-radius: 14px;
+  aspect-ratio: 16/10;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  margin-bottom: 20px;
+  border: 1px solid var(--border2);
+  position: relative;
+}
+.screen-bar {
+  background: var(--dark3);
+  height: 32px;
+  display: flex; align-items: center;
+  padding: 0 14px; gap: 6px;
+  border-bottom: 1px solid var(--border2);
+  flex-shrink: 0;
+}
+.dot { width:8px;height:8px;border-radius:50%; }
+.d1{background:#FF5F56;} .d2{background:#FFBD2E;} .d3{background:var(--lime);}
+.screen-content {
+  flex:1; display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 12px; padding: 20px;
+}
+.sc-icon {
+  font-size: 48px;
+  filter: drop-shadow(0 0 20px rgba(200,241,53,0.4));
+  animation: floatIcon 4s ease-in-out infinite;
+}
+@keyframes floatIcon { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.sc-label {
+  font-family:'Syne',sans-serif; font-weight:700; font-size:14px;
+  color:var(--lime); letter-spacing:1px; text-transform:uppercase;
+}
+.sc-sub { font-size:12px; color:var(--dim); text-align:center; }
+
+.device-specs {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+.spec-item {
+  background: var(--dark3);
+  border-radius: 10px; padding: 12px 10px;
+  text-align:center;
+  border: 1px solid var(--border2);
+}
+.spec-val { font-family:'Syne',sans-serif; font-weight:700; font-size:18px; color:var(--lime); }
+.spec-key { font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+
+/* Floating badges */
+.float-badge {
+  position: absolute;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 600;
+  white-space: nowrap;
+  animation: floatBadge 5s ease-in-out infinite;
+}
+@keyframes floatBadge { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+.fb1 { top:-20px; left:-30px; animation-delay:0s; }
+.fb2 { bottom:-10px; right:-20px; animation-delay:2.5s; }
+.fb-dot { width:8px;height:8px;border-radius:50%;background:var(--lime); }
+
+/* Hero stats bar */
+.hero-stats {
+  position: relative; z-index:1;
+  grid-column: 1 / -1;
+  display: flex; gap: 0;
+  border-top: 1px solid var(--border2);
+  margin: 0 -60px;
+  padding: 0 60px;
+}
+.stat-item {
+  flex:1; padding: 28px 24px;
+  border-right: 1px solid var(--border2);
+}
+.stat-item:last-child { border-right:none; }
+.stat-n {
+  font-family:'Syne',sans-serif; font-weight:800; font-size:32px;
+  color:var(--lime); display:block; line-height:1;
+}
+.stat-l { font-size:13px; color:var(--dim); margin-top:4px; }
+
+/* ═══════════════════════════════════════════
+   SECTION COMMONS
+═══════════════════════════════════════════ */
+.section-wrap {
+  max-width: 1100px; margin: 0 auto;
+  padding: 100px 60px;
+}
+.s-eyebrow {
+  font-size:11px; font-weight:600;
+  letter-spacing:3px; text-transform:uppercase;
+  color:var(--lime); margin-bottom:14px;
+  display:flex; align-items:center; gap:8px;
+}
+.s-eyebrow::before { content:''; display:block; width:20px; height:2px; background:var(--lime); }
+.s-title {
+  font-family:'Syne',sans-serif;
+  font-size: clamp(32px,4vw,54px);
+  font-weight:800; letter-spacing:-2px;
+  line-height:1.1; margin-bottom:18px;
+}
+.s-sub { font-size:17px; color:var(--muted); max-width:520px; line-height:1.8; margin-bottom:60px; }
+
+/* ═══════════════════════════════════════════
+   QUÉ HACEMOS
+═══════════════════════════════════════════ */
+#que-hacemos { background: var(--dark2); }
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 2px;
+  background: var(--border2);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.service-item {
+  background: var(--dark2);
+  padding: 36px 28px;
+  transition: all 0.3s;
+  position: relative;
+  overflow:hidden;
+}
+.service-item::after {
+  content:'';
+  position:absolute; bottom:0; left:0; right:0; height:2px;
+  background: var(--lime); transform:scaleX(0); transform-origin:left;
+  transition: transform 0.35s ease;
+}
+.service-item:hover { background: var(--panel); }
+.service-item:hover::after { transform:scaleX(1); }
+.srv-icon {
+  width:52px;height:52px;
+  background: rgba(200,241,53,0.08);
+  border:1px solid rgba(200,241,53,0.2);
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px; margin-bottom:20px;
+}
+.srv-title { font-family:'Syne',sans-serif; font-weight:700; font-size:18px; margin-bottom:10px; }
+.srv-desc { font-size:14px; color:var(--muted); line-height:1.7; }
+
+/* Feature band */
+.feat-band {
+  display:flex; gap:20px; margin-top:48px; flex-wrap:wrap;
+}
+.feat-pill {
+  display:flex; align-items:center; gap:8px;
+  background: var(--panel);
+  border:1px solid var(--border);
+  border-radius:100px;
+  padding:10px 20px;
+  font-size:14px; font-weight:500; color:var(--muted);
+}
+.feat-pill svg { flex-shrink:0; }
+
+/* ═══════════════════════════════════════════
+   NOSOTROS
+═══════════════════════════════════════════ */
+#nosotros { background: var(--dark); }
+
+.about-grid {
+  display: grid; grid-template-columns: 5fr 4fr; gap:60px; align-items:center;
+  margin-bottom:80px;
+}
+.about-text p { font-size:16px; color:var(--muted); line-height:1.9; margin-bottom:18px; }
+.about-text p:last-child { margin-bottom:0; }
+.about-text strong { color:var(--lime); }
+
+.about-card {
+  background: var(--panel);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:28px;
+  position:relative; overflow:hidden;
+}
+.about-card::before {
+  content:'';
+  position:absolute; top:0; right:0; width:140px; height:140px;
+  background: radial-gradient(circle, rgba(200,241,53,0.08) 0%, transparent 70%);
+}
+.ac-logo {
+  font-family:'Syne',sans-serif; font-weight:800; font-size:36px;
+  color:var(--lime); margin-bottom:6px;
+}
+.ac-origin { font-size:13px; color:var(--dim); margin-bottom:24px; }
+.ac-facts { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.ac-fact {
+  background:var(--dark2); border:1px solid var(--border2);
+  border-radius:12px; padding:14px 16px;
+}
+.acf-n {
+  font-family:'Syne',sans-serif; font-weight:800; font-size:22px;
+  color:var(--text);
+}
+.acf-l { font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+
+/* ═══════════════════════════════════════════
+   FUNDADORES
+═══════════════════════════════════════════ */
+.founders-title { margin-bottom: 40px; }
+
+.founders-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+.founder-card {
+  background: var(--panel);
+  border:1px solid var(--border2);
+  border-radius:20px;
+  padding:28px 16px 22px;
+  text-align:center;
+  transition:all 0.3s;
+  cursor:default;
+  position:relative;
+  overflow:hidden;
+}
+.founder-card::before {
+  content:'';
+  position:absolute; top:0;left:0;right:0; height:1px;
+  background: linear-gradient(90deg,transparent,var(--lime),transparent);
+  opacity:0; transition:opacity 0.3s;
+}
+.founder-card:hover { border-color:rgba(200,241,53,0.3); transform:translateY(-6px); box-shadow:0 24px 48px rgba(0,0,0,0.4); }
+.founder-card:hover::before { opacity:1; }
+
+/* Avatar con foto */
+.founder-avatar-wrap {
+  position:relative; width:80px; height:80px;
+  margin:0 auto 16px;
+}
+.founder-photo {
+  width:80px; height:80px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid rgba(200,241,53,0.3);
+  background: var(--dark2);
+  display:block;
+}
+/* Placeholder si no hay foto */
+.founder-initials {
+  width:80px; height:80px;
+  border-radius:50%;
+  background: linear-gradient(135deg, var(--panel2), var(--dark3));
+  border:2px solid rgba(200,241,53,0.25);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif; font-weight:800; font-size:24px;
+  color:var(--lime);
+  margin:0 auto 16px;
+  position:relative;
+}
+.upload-hint {
+  position:absolute; bottom:-2px; right:-2px;
+  width:24px;height:24px;border-radius:50%;
+  background:var(--lime); color:var(--dark);
+  font-size:13px; display:flex;align-items:center;justify-content:center;
+  border:2px solid var(--dark2);
+  font-weight:700;
+}
+.founder-name { font-family:'Syne',sans-serif; font-weight:700; font-size:15px; margin-bottom:4px; letter-spacing:-0.3px; }
+.founder-role { font-size:11px; color:var(--lime); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px; }
+.founder-area { font-size:12px; color:var(--dim); line-height:1.5; }
+
+/* Photo upload note */
+.photo-note {
+  margin-top:32px;
+  background: var(--panel);
+  border:1px dashed rgba(200,241,53,0.3);
+  border-radius:14px;
+  padding:18px 24px;
+  display:flex;align-items:center;gap:14px;
+  font-size:13px; color:var(--muted);
+}
+.photo-note strong { color:var(--lime); }
+
+/* ═══════════════════════════════════════════
+   OPERACIONES / ERP
+═══════════════════════════════════════════ */
+#operaciones { background: var(--dark2); }
+
+.erp-layout {
+  display: grid; grid-template-columns: 3fr 2fr; gap:48px; align-items:start;
+}
+.erp-modules {
+  display:grid; grid-template-columns:1fr 1fr; gap:12px;
+  margin-bottom:24px;
+}
+.mod {
+  background:var(--dark);
+  border:1px solid var(--border2);
+  border-radius:14px;
+  padding:18px 16px;
+  transition:all 0.25s;
+}
+.mod:hover { border-color:rgba(200,241,53,0.25); background:rgba(200,241,53,0.03); }
+.mod-ico { font-size:20px; margin-bottom:8px; }
+.mod-n { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; margin-bottom:4px; }
+.mod-d { font-size:12px; color:var(--dim); line-height:1.5; }
+
+.erp-access {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:28px;
+  position:sticky; top:88px;
+}
+.ea-head { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+.ea-icon {
+  width:44px;height:44px;
+  background:rgba(200,241,53,0.1);border:1px solid rgba(200,241,53,0.2);
+  border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;
+}
+.ea-title { font-family:'Syne',sans-serif; font-weight:700; font-size:16px; }
+.ea-sub { font-size:12px; color:var(--dim); }
+.ea-status {
+  display:flex;align-items:center;gap:6px;
+  background:rgba(200,241,53,0.08);border:1px solid rgba(200,241,53,0.2);
+  border-radius:8px;padding:8px 14px;
+  font-size:12px;color:var(--lime);font-weight:500;
+  margin-bottom:20px;
+}
+.ea-status::before { content:''; width:6px;height:6px;border-radius:50%;background:var(--lime);flex-shrink:0; animation:blink 2s infinite; }
+.ea-info { font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:22px; }
+.ea-btns { display:flex;flex-direction:column;gap:10px; }
+.btn-drive {
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--lime);color:var(--dark);
+  font-family:'Syne',sans-serif;font-weight:700;font-size:14px;
+  padding:13px 20px;border-radius:12px;text-decoration:none;
+  transition:all 0.2s;
+}
+.btn-drive:hover { background:var(--lime-dk);transform:translateY(-1px);box-shadow:0 8px 24px rgba(200,241,53,0.2); }
+.btn-drive-out {
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:transparent;color:var(--muted);
+  font-size:14px;font-weight:500;
+  padding:12px 20px;border-radius:12px;text-decoration:none;
+  border:1px solid var(--border2);
+  transition:all 0.2s;
+}
+.btn-drive-out:hover { color:var(--text);border-color:var(--border); }
+
+/* ═══════════════════════════════════════════
+   ECOSISTEMA DIGITAL
+═══════════════════════════════════════════ */
+#ecosistema { background: var(--dark); }
+
+.tool-list { display:flex;flex-direction:column;gap:16px; }
+.tool-row {
+  background:var(--panel);
+  border:1px solid var(--border2);
+  border-radius:20px;
+  padding:0;
+  overflow:hidden;
+  transition:all 0.3s;
+}
+.tool-row:hover { border-color:rgba(200,241,53,0.2); }
+.tool-row-top {
+  display:grid; grid-template-columns:64px 1fr 1fr 1fr;
+  gap:0; cursor:pointer;
+}
+.tool-ico-cell {
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px; padding:28px 0;
+  border-right:1px solid var(--border2);
+}
+.tool-col-cell { padding:24px 28px; border-right:1px solid var(--border2); }
+.tool-col-cell:last-child { border-right:none; }
+.tcc-label {
+  font-size:10px;font-weight:600;letter-spacing:2px;
+  text-transform:uppercase;color:var(--lime);
+  margin-bottom:8px;
+}
+.tcc-title { font-family:'Syne',sans-serif;font-weight:700;font-size:17px;margin-bottom:6px; }
+.tcc-text { font-size:13px;color:var(--muted);line-height:1.6; }
+.tcc-badge {
+  display:inline-block;margin-top:8px;
+  font-size:11px;font-weight:600;
+  background:rgba(200,241,53,0.1);color:var(--lime);
+  border:1px solid rgba(200,241,53,0.2);
+  border-radius:6px;padding:3px 10px;
+}
+
+/* ═══════════════════════════════════════════
+   CTA WHATSAPP
+═══════════════════════════════════════════ */
+#contacto {
+  background: var(--dark2);
+  border-top:1px solid var(--border2);
+}
+.cta-wrap {
+  max-width:700px; margin:0 auto;
+  padding:100px 60px;
+  text-align:center;
+}
+.cta-icon { font-size:56px; margin-bottom:24px; display:block; filter:drop-shadow(0 0 30px rgba(37,211,102,0.4)); }
+.cta-title {
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(32px,5vw,56px);letter-spacing:-2px;
+  line-height:1.1;margin-bottom:20px;
+}
+.cta-title span { color:var(--wa); }
+.cta-sub { font-size:17px;color:var(--muted);margin-bottom:40px;line-height:1.8; }
+.btn-whatsapp {
+  display:inline-flex;align-items:center;gap:12px;
+  background:var(--wa);color:#fff;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:18px;
+  padding:18px 44px;border-radius:100px;text-decoration:none;
+  transition:all 0.25s;
+  box-shadow:0 0 0 0 rgba(37,211,102,0.4);
+  animation: waPulse 3s ease-in-out infinite;
+}
+@keyframes waPulse {
+  0%,100%{box-shadow:0 0 0 0 rgba(37,211,102,0.0)}
+  50%{box-shadow:0 0 0 12px rgba(37,211,102,0.0)}
+}
+.btn-whatsapp:hover { background:#1da851;transform:translateY(-3px);box-shadow:0 16px 40px rgba(37,211,102,0.35); }
+.wa-number { margin-top:20px;font-size:15px;color:var(--dim); }
+.wa-number strong { color:var(--muted); }
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+footer {
+  background:var(--dark);
+  border-top:1px solid var(--border2);
+  padding:40px 60px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:20px; flex-wrap:wrap;
+}
+.foot-logo {
+  font-family:'Syne',sans-serif;font-weight:800;font-size:20px;
+  letter-spacing:-0.5px;color:var(--text);text-decoration:none;
+}
+.foot-logo span{color:var(--lime);}
+.foot-info { font-size:13px;color:var(--dim);text-align:center;line-height:1.7; }
+.foot-right { font-size:12px;color:var(--dim); text-align:right; }
+.foot-right strong { color:var(--muted); }
+
+/* ═══════════════════════════════════════════
+   FLOATING WA BUTTON
+═══════════════════════════════════════════ */
+.wa-float {
+  position:fixed;bottom:30px;right:30px;z-index:300;
+  width:60px;height:60px;border-radius:50%;
+  background:var(--wa);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;text-decoration:none;
+  box-shadow:0 8px 32px rgba(37,211,102,0.4);
+  transition:all 0.25s;
+  animation:floatWA 4s ease-in-out infinite;
+}
+.wa-float:hover { transform:scale(1.1);box-shadow:0 12px 40px rgba(37,211,102,0.5); }
+@keyframes floatWA { 0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)} }
+.wa-float-label {
+  position:absolute;right:70px;
+  background:var(--dark);color:var(--text);
+  font-size:12px;font-weight:600;white-space:nowrap;
+  padding:6px 12px;border-radius:8px;
+  border:1px solid var(--border2);
+  opacity:0;transform:translateX(8px);transition:all 0.2s;
+  pointer-events:none;
+}
+.wa-float:hover .wa-float-label { opacity:1;transform:translateX(0); }
+
+/* ═══════════════════════════════════════════
+   DIVIDER
+═══════════════════════════════════════════ */
+.divider { height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent); }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media(max-width:1024px){
+  #inicio { grid-template-columns:1fr; }
+  .hero-right { display:none; }
+  .hero-stats { grid-column:1; flex-wrap:wrap; }
+  .about-grid { grid-template-columns:1fr; }
+  .founders-grid { grid-template-columns:repeat(3,1fr); }
+  .erp-layout { grid-template-columns:1fr; }
+  .erp-access { position:static; }
+  .services-grid { grid-template-columns:1fr 1fr; }
+  .tool-row-top { grid-template-columns:1fr; }
+  .tool-ico-cell { display:none; }
+  .tool-col-cell { border-right:none; border-bottom:1px solid var(--border2); }
+  .tool-col-cell:last-child { border-bottom:none; }
+}
+@media(max-width:700px){
+  nav { padding:0 20px; }
+  .nav-links { gap:2px; }
+  .nav-links a:not(.nav-wa) { display:none; }
+  .section-wrap { padding:70px 24px; }
+  .hero-left { padding:60px 0 40px; }
+  #inicio { padding:68px 24px 0; }
+  .hero-stats { padding:0 24px; margin:0 -24px; }
+  .stat-item { padding:20px 16px; }
+  .founders-grid { grid-template-columns:1fr 1fr; }
+  .services-grid { grid-template-columns:1fr; }
+  .cta-wrap { padding:70px 24px; }
+  footer { padding:30px 24px; flex-direction:column; text-align:center; }
+  .foot-right { text-align:center; }
+}
+</style>
+</head>
+<body>
+
+<!-- FLOTANTE WhatsApp -->
+<a href="https://wa.me/59175223813" target="_blank" class="wa-float" title="Contactar por WhatsApp">
+  <span class="wa-float-label">¡Escríbenos!</span>
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<!-- ══════════════ NAV ══════════════ -->
+<nav>
+  <a href="#inicio" class="logo">Yara<span>Tech</span> <sub>Caranavi · BO</sub></a>
+  <div class="nav-links">
+    <a href="#que-hacemos">¿Qué hacemos?</a>
+    <a href="#nosotros">Nosotros</a>
+    <a href="#operaciones">Operaciones</a>
+    <a href="#ecosistema">Ecosistema</a>
+    <a href="https://wa.me/59175223813" target="_blank" class="nav-wa">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp
+    </a>
+  </div>
+</nav>
+
+<!-- ══════════════ HERO ══════════════ -->
+<section id="inicio">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-left">
+    <div class="hero-tag">Fundada en Caranavi, Bolivia · 2024</div>
+    <h1 class="hero-h1">
+      <span class="dim-word">Tu tecnología</span>
+      <span class="hl">al alcance</span>
+      de todos.
+    </h1>
+    <p class="hero-p">
+      YaraTech nació en Caranavi para acercar computadoras, laptops y accesorios de calidad a toda Bolivia. Somos universitarios de la UMSA con una misión clara: democratizar el acceso a la tecnología.
+    </p>
+    <div class="hero-actions">
+      <a href="https://wa.me/59175223813" target="_blank" class="btn-lime">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Hacer un pedido
+      </a>
+      <a href="#que-hacemos" class="btn-ghost">Ver productos →</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-device">
+      <div class="float-badge fb1">
+        <div class="fb-dot"></div> Stock disponible hoy
+      </div>
+      <div class="device-card">
+        <div class="device-screen">
+          <div class="screen-bar">
+            <div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div>
+          </div>
+          <div class="screen-content">
+            <div class="sc-icon">💻</div>
+            <div class="sc-label">YaraTech Store</div>
+            <div class="sc-sub">Laptops · PCs · Accesorios</div>
+          </div>
+        </div>
+        <div class="device-specs">
+          <div class="spec-item">
+            <div class="spec-val">50+</div>
+            <div class="spec-key">Productos</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-val">100%</div>
+            <div class="spec-key">Original</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-val">24h</div>
+            <div class="spec-key">Respuesta</div>
+          </div>
+        </div>
+      </div>
+      <div class="float-badge fb2">
+        <span style="font-size:16px;">📦</span> Envío a todo Bolivia
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-item">
+      <span class="stat-n">2024</span>
+      <div class="stat-l">Año de fundación</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-n">5</span>
+      <div class="stat-l">Cofundadores UMSA</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-n">3+</span>
+      <div class="stat-l">Líneas de productos</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-n">Caranavi</span>
+      <div class="stat-l">Sede principal, Bolivia</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════ QUÉ HACEMOS ══════════════ -->
+<section id="que-hacemos">
+  <div class="section-wrap">
+    <div class="s-eyebrow">Nuestros productos</div>
+    <h2 class="s-title">¿Qué hacemos?</h2>
+    <p class="s-sub">Ofrecemos equipos tecnológicos de calidad a precios justos, con atención personalizada para cada cliente. Desde Caranavi para toda Bolivia.</p>
+
+    <div class="services-grid">
+      <div class="service-item">
+        <div class="srv-icon">💻</div>
+        <div class="srv-title">Laptops</div>
+        <p class="srv-desc">Laptops para estudio, trabajo y gaming. Marcas como Lenovo, HP, Asus y Dell con garantía. Desde gama de entrada hasta equipos de alto rendimiento.</p>
+      </div>
+      <div class="service-item">
+        <div class="srv-icon">🖥️</div>
+        <div class="srv-title">Computadoras de escritorio</div>
+        <p class="srv-desc">PCs ensambladas y de marca para oficina y hogar. Configuraciones personalizadas según tu presupuesto y necesidades específicas.</p>
+      </div>
+      <div class="service-item">
+        <div class="srv-icon">🖱️</div>
+        <div class="srv-title">Accesorios & Periféricos</div>
+        <p class="srv-desc">Teclados, mouse, auriculares, webcams, hubs USB, memorias, discos externos y todo lo que necesitas para completar tu setup.</p>
+      </div>
+      <div class="service-item">
+        <div class="srv-icon">🔧</div>
+        <div class="srv-title">Soporte técnico</div>
+        <p class="srv-desc">Asesoría en la compra del equipo ideal. Orientamos a cada cliente para elegir el producto que mejor se adapta a su uso y presupuesto.</p>
+      </div>
+      <div class="service-item">
+        <div class="srv-icon">📦</div>
+        <div class="srv-title">Envíos a Bolivia entera</div>
+        <p class="srv-desc">Coordinamos envíos seguros a La Paz, Cochabamba, Santa Cruz y más. Embalaje protegido y seguimiento de tu pedido en tiempo real vía WhatsApp.</p>
+      </div>
+      <div class="service-item">
+        <div class="srv-icon">💳</div>
+        <div class="srv-title">Facilidades de pago</div>
+        <p class="srv-desc">Aceptamos transferencias, Tigo Money y pagos en efectivo. Consulta por opciones de pago diferido para equipos de mayor valor.</p>
+      </div>
+    </div>
+
+    <div class="feat-band">
+      <div class="feat-pill">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--lime)" stroke-width="2"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg>
+        Productos 100% originales
+      </div>
+      <div class="feat-pill">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--lime)" stroke-width="2"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg>
+        Garantía en todos los equipos
+      </div>
+      <div class="feat-pill">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--lime)" stroke-width="2"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg>
+        Atención personalizada por WhatsApp
+      </div>
+      <div class="feat-pill">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--lime)" stroke-width="2"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg>
+        Precios competitivos
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════ NOSOTROS ══════════════ -->
+<section id="nosotros">
+  <div class="section-wrap">
+    <div class="s-eyebrow">Nuestra historia</div>
+    <h2 class="s-title">Nosotros</h2>
+
+    <div class="about-grid">
+      <div class="about-text">
+        <p>
+          <strong>YaraTech nació de una necesidad real:</strong> en Caranavi, una de las ciudades más dinámicas del norte paceño, conseguir tecnología de calidad significaba viajar horas hasta La Paz o pagar precios desorbitados a intermediarios. Un grupo de estudiantes de la <strong>Universidad Mayor de San Andrés (UMSA)</strong> decidió cambiar eso.
+        </p>
+        <p>
+          En 2024, cinco cofundadores universitarios — compañeros de facultad que compartían la misma visión — pusieron en marcha YaraTech. Con capital propio, mucho estudio de mercado y la formación empresarial adquirida en la UMSA, levantaron una tienda que hoy opera de forma completamente digital: catálogo por WhatsApp, gestión de inventario en la nube y distribución a todo el país.
+        </p>
+        <p>
+          El nombre <strong>"Yara"</strong>, que en lengua quechua evoca la idea de semilla y crecimiento, refleja el espíritu del proyecto: una empresa pequeña que crece con sus clientes. Hoy somos la primera opción tecnológica de cientos de familias y profesionales en Caranavi y sus alrededores.
+        </p>
+        <p>
+          Nuestra propuesta es simple: <strong>tecnología real, a precios justos, desde Bolivia.</strong>
+        </p>
+      </div>
+
+      <div class="about-card">
+        <div class="ac-logo">YaraTech</div>
+        <div class="ac-origin">📍 Caranavi, La Paz — Bolivia</div>
+        <div class="ac-facts">
+          <div class="ac-fact">
+            <div class="acf-n">UMSA</div>
+            <div class="acf-l">Universidad</div>
+          </div>
+          <div class="ac-fact">
+            <div class="acf-n">2024</div>
+            <div class="acf-l">Fundación</div>
+          </div>
+          <div class="ac-fact">
+            <div class="acf-n">5</div>
+            <div class="acf-l">Fundadores</div>
+          </div>
+          <div class="ac-fact">
+            <div class="acf-n">BO</div>
+            <div class="acf-l">Cobertura</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FUNDADORES -->
+    <div class="founders-title">
+      <div class="s-eyebrow">El equipo fundador</div>
+      <h3 style="font-family:'Syne',sans-serif;font-weight:800;font-size:28px;letter-spacing:-1px;">Los 5 detrás de YaraTech</h3>
+    </div>
+
+    <div class="founders-grid">
+
+      <div class="founder-card">
+        <!--
+          FOTO HABNER: Reemplaza la etiqueta de abajo con:
+          <img src="foto-habner.jpg" alt="Habner Mollo" class="founder-photo">
+          y elimina el div .founder-initials
+        -->
+        <img src="assets/img/foto-habner.png" alt="Habner Mollo" class="founder-photo">
+        <div class="founder-name">Habner Mollo</div>
+        <div class="founder-role">CEO & Fundador</div>
+        <div class="founder-area">Estrategia empresarial y dirección general del proyecto. Gestión de proveedores.</div>
+      </div>
+
+      <div class="founder-card">
+        <!--
+          FOTO ANAHÍ: Reemplaza con:
+          <img src="foto-anahi.jpg" alt="Anahí Acevedo" class="founder-photo">
+        -->
+        <img src="assets/img/foto-anahi.png" alt="Anahí Acevedo" class="founder-photo">
+        <div class="founder-name">Anahí Acevedo</div>
+        <div class="founder-role">Directora Comercial</div>
+        <div class="founder-area">Ventas, atención al cliente y desarrollo de la cartera de clientes en Caranavi.</div>
+      </div>
+
+      <div class="founder-card">
+        <!--
+          FOTO EMMA: Reemplaza con:
+          <img src="foto-emma.jpg" alt="Emma Candia" class="founder-photo">
+        -->
+        <img src="assets/img/foto-emma.jpeg" alt="Emma Candia" class="founder-photo">
+        <div class="founder-name">Emma Candia</div>
+        <div class="founder-role">Directora de Finanzas</div>
+        <div class="founder-area">Administración financiera, control del ERP y gestión del presupuesto operativo.</div>
+      </div>
+
+      <div class="founder-card">
+        <!--
+          FOTO SOFÍA: Reemplaza con:
+          <img src="foto-sofia.jpg" alt="Sofia Intimayta" class="founder-photo">
+        -->
+        <img src="assets/img/foto-sofia.jpeg" alt="Sofia Intimayta" class="founder-photo">
+        <div class="founder-name">Sofia Intimayta</div>
+        <div class="founder-role">Dir. de Marketing</div>
+        <div class="founder-area">Posicionamiento digital, redes sociales, Google My Business y comunicación de marca.</div>
+      </div>
+
+      <div class="founder-card">
+        <!--
+          FOTO CRISTINA: Reemplaza con:
+          <img src="foto-cristina.jpg" alt="Cristina Avirari" class="founder-photo">
+        -->
+        <img src="assets/img/foto-cristina.png" alt="Cristina Avirari" class="founder-photo">
+        <div class="founder-name">Cristina Avirari</div>
+        <div class="founder-role">Dir. de Logística</div>
+        <div class="founder-area">Coordinación de envíos, inventario y relación con transportistas a nivel nacional.</div>
+      </div>
+
+    </div>
+
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════ OPERACIONES / ERP ══════════════ -->
+<section id="operaciones">
+  <div class="section-wrap">
+    <div class="s-eyebrow">Sistema de gestión</div>
+    <h2 class="s-title">Centro de Operaciones</h2>
+    <p class="s-sub">Nuestro ERP en Excel, administrado desde Google Drive, centraliza toda la operación de YaraTech.</p>
+
+    <div class="erp-layout">
+      <div>
+        <div class="erp-modules">
+          <div class="mod">
+            <div class="mod-ico">📦</div>
+            <div class="mod-n">Inventario</div>
+            <div class="mod-d">Control de stock de laptops, PCs y accesorios. Alertas automáticas de bajo inventario.</div>
+          </div>
+          <div class="mod">
+            <div class="mod-ico">💰</div>
+            <div class="mod-n">Ventas</div>
+            <div class="mod-d">Registro de pedidos, seguimiento de clientes y cálculo de ingresos por producto.</div>
+          </div>
+          <div class="mod">
+            <div class="mod-ico">🚚</div>
+            <div class="mod-n">Logística</div>
+            <div class="mod-d">Control de envíos, transportistas y tiempos de entrega por departamento.</div>
+          </div>
+          <div class="mod">
+            <div class="mod-ico">🏭</div>
+            <div class="mod-n">Proveedores</div>
+            <div class="mod-d">Base de datos de proveedores, órdenes de compra y comparación de precios mayoristas.</div>
+          </div>
+          <div class="mod">
+            <div class="mod-ico">📈</div>
+            <div class="mod-n">Finanzas</div>
+            <div class="mod-d">Flujo de caja, márgenes de ganancia por producto y reportes de rentabilidad mensual.</div>
+          </div>
+          <div class="mod">
+            <div class="mod-ico">👥</div>
+            <div class="mod-n">Clientes</div>
+            <div class="mod-d">CRM básico: historial de compras, contactos frecuentes y segmentación por ciudad.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="erp-access">
+        <div class="ea-head">
+          <div class="ea-icon">☁️</div>
+          <div>
+            <div class="ea-title">YaraTech ERP v1.0</div>
+            <div class="ea-sub">Google Drive · Acceso restringido</div>
+          </div>
+        </div>
+        <div class="ea-status">Sistema activo · Actualizado hoy</div>
+        <p class="ea-info">
+          El libro Excel de gestión está alojado en Google Drive. Solo miembros autorizados del equipo YaraTech pueden visualizar y editar el archivo. Para solicitar acceso, contacta al administrador.
+        </p>
+        <div class="ea-btns">
+          <a href="https://drive.google.com" target="_blank" class="btn-drive">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4.788 17.5l1.5-2.598H20l-1.5 2.598H4.788zm6.424-11.096L8.614 10.5H2l3.212-5.596h6.624zm.788 0L15.212 10.5H8.614l2.6-4.5.786 1.404zM12 8.5l-1.5 2.598L12 13.5l1.5-2.598L12 8.5z"/></svg>
+            Abrir en Google Drive
+          </a>
+          <a href="https://docs.google.com/spreadsheets/d/1NrAiXOyNK3ikZN9Mr-TNIX5Cxjm8Rax9/edit?gid=1898690644#gid=1898690644" target="_blank" class="btn-drive-out">
+            📊 Ver hoja de Excel
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════ ECOSISTEMA DIGITAL ══════════════ -->
+<section id="ecosistema">
+  <div class="section-wrap">
+    <div class="s-eyebrow">Ecosistema Google</div>
+    <h2 class="s-title">Herramientas que potencian<br>YaraTech</h2>
+    <p class="s-sub">Investigamos y adoptamos 7 herramientas del ecosistema Google que resuelven problemas reales de nuestra operación.</p>
+
+    <div class="tool-list">
+
+      <!-- 1 -->
+      <div class="tool-row">
+        <div class="tool-row-top">
+          <div class="tool-ico-cell">📊</div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">Herramienta 1</div>
+            <div class="tcc-title">Google Trends</div>
+            <div class="tcc-text">Herramienta gratuita que muestra la popularidad de búsquedas en Google por región y período de tiempo.</div>
+            <span class="tcc-badge">Gratuita</span>
+          </div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">¿Por qué la necesitamos?</div>
+            <div class="tcc-text">Para detectar cuándo aumenta la demanda de laptops y equipos (inicio de clases, fin de año) y preparar nuestro stock con anticipación, evitando quedarnos sin productos en los picos de venta.</div>
+          </div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">Aplicación en YaraTech</div>
+            <div class="tcc-text">Buscamos "laptop Bolivia" y "comprar computadora La Paz" en Trends. Detectamos que en febrero y agosto la búsqueda sube un 60%. Programamos compras a proveedores con 3 semanas de anticipación.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="tool-row">
+        <div class="tool-row-top">
+          <div class="tool-ico-cell">📍</div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">Herramienta 2</div>
+            <div class="tcc-title">Google My Business</div>
+            <div class="tcc-text">Perfil gratuito que posiciona a YaraTech en Google Maps y en los resultados de búsqueda local con fotos, reseñas y horarios.</div>
+            <span class="tcc-badge">Gratuita</span>
+          </div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">¿Por qué la necesitamos?</div>
+            <div class="tcc-text">La mayoría de clientes busca "tienda de laptops Caranavi" en Google antes de comprar. Sin perfil verificado, somos invisibles. Las reseñas positivas generan confianza en clientes nuevos.</div>
+          </div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">Aplicación en YaraTech</div>
+            <div class="tcc-text">Publicamos fotos del catálogo, actualizamos el número de WhatsApp y horarios. Pedimos reseñas a clientes satisfechos. Resultado: aparecemos en "tienda tech cerca de mí" en todo el municipio de Caranavi.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="tool-row">
+        <div class="tool-row-top">
+          <div class="tool-ico-cell">📋</div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">Herramienta 3</div>
+            <div class="tcc-title">Google Forms + Sheets</div>
+            <div class="tcc-text">Forms crea formularios de pedido online. Cada respuesta se vuelca automáticamente en una hoja de Sheets, creando un registro de pedidos sin transcripción manual.</div>
+            <span class="tcc-badge">Gratuita</span>
+          </div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">¿Por qué la necesitamos?</div>
+            <div class="tcc-text">Recibir pedidos por WhatsApp informalmente genera errores, olvidos y falta de registro. Un formulario estandarizado captura: nombre, producto, ciudad de envío y medio de pago, conectado directo a nuestro ERP.</div>
+          </div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">Aplicación en YaraTech</div>
+            <div class="tcc-text">Creamos "Formulario de Pedido YaraTech". El cliente llena el form desde el link en nuestra bio. El pedido aparece al instante en Google Sheets y dispara una alerta al equipo de logística para preparar el envío.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="tool-row">
+        <div class="tool-row-top">
+          <div class="tool-ico-cell">📉</div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">Herramienta 4</div>
+            <div class="tcc-title">Looker Studio</div>
+            <div class="tcc-text">Plataforma de Business Intelligence de Google que conecta con nuestro Excel/Sheets y genera dashboards visuales actualizados automáticamente.</div>
+            <span class="tcc-badge">Gratuita</span>
+          </div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">¿Por qué la necesitamos?</div>
+            <div class="tcc-text">Ver filas de datos en Excel no es suficiente para tomar decisiones rápidas. Looker convierte los números del ERP en gráficos claros: qué producto se vende más, qué ciudad genera más pedidos y cuál es el margen por línea.</div>
+          </div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">Aplicación en YaraTech</div>
+            <div class="tcc-text">Conectamos el Sheet de ventas a Looker. El gerente ve en tiempo real: ventas del mes, top 5 productos más vendidos, ingresos por departamento y cumplimiento de meta. Todo accesible desde el celular en un dashboard.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="tool-row">
+        <div class="tool-row-top">
+          <div class="tool-ico-cell">📅</div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">Herramienta 5</div>
+            <div class="tcc-title">Google Calendar</div>
+            <div class="tcc-text">Agenda compartida en la nube para coordinar entregas, reuniones de equipo, fechas de pago a proveedores y seguimiento de pedidos con recordatorios automáticos.</div>
+            <span class="tcc-badge">Gratuita</span>
+          </div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">¿Por qué la necesitamos?</div>
+            <div class="tcc-text">Con 5 fundadores y múltiples pedidos activos, sin una agenda central se pierden fechas de entrega, se olvidan pagos y los clientes quedan sin respuesta. Calendar mantiene a todo el equipo sincronizado sin llamadas innecesarias.</div>
+          </div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">Aplicación en YaraTech</div>
+            <div class="tcc-text">Cada pedido confirmado genera un evento en el calendario de Logística con: cliente, producto, ciudad de destino y transportista asignado. El equipo ve su agenda del día sin necesidad de coordinar por mensajes.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="tool-row">
+        <div class="tool-row-top">
+          <div class="tool-ico-cell">☁️</div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">Herramienta 6</div>
+            <div class="tcc-title">Google Drive</div>
+            <div class="tcc-text">Almacenamiento en la nube para todos los archivos de YaraTech: el ERP en Excel, facturas, contratos con proveedores, catálogos de productos y registros contables.</div>
+            <span class="tcc-badge">Gratuita</span>
+          </div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">¿Por qué la necesitamos?</div>
+            <div class="tcc-text">Guardar archivos en una sola computadora es un riesgo: si el equipo falla, se pierden todos los datos de la empresa. Drive garantiza que nuestro ERP y documentos críticos estén seguros, accesibles y respaldados en la nube.</div>
+          </div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">Aplicación en YaraTech</div>
+            <div class="tcc-text">El ERP (Excel Taller 1) vive en Drive con acceso controlado por roles: Finanzas puede editar, Logística puede solo ver, y el CEO tiene control total. Los 5 fundadores acceden desde cualquier dispositivo sin enviar archivos por WhatsApp.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7 -->
+      <div class="tool-row">
+        <div class="tool-row-top">
+          <div class="tool-ico-cell">🌐</div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">Herramienta 7</div>
+            <div class="tcc-title">Google Sites</div>
+            <div class="tcc-text">Constructor de sitios web corporativos sin necesidad de programación, integrado con todo el ecosistema Google: Drive, Forms, Calendar y Maps en una sola URL.</div>
+            <span class="tcc-badge">Gratuita</span>
+          </div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">¿Por qué la necesitamos?</div>
+            <div class="tcc-text">Un negocio sin presencia web en 2024 depende 100% de redes sociales, que pueden desaparecer o cambiar sus algoritmos. Google Sites nos da un hub digital propio, profesional y gratuito que centraliza toda la información de YaraTech.</div>
+          </div>
+          <div class="tool-col-cell">
+            <div class="tcc-label">Aplicación en YaraTech</div>
+            <div class="tcc-text">Construimos este Hub Digital en Google Sites (replicando este diseño) con acceso al ERP, formulario de pedidos integrado, mapa de ubicación en Caranavi y catálogo. La URL se comparte con clientes como carta de presentación profesional.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════ CONTACTO / WA CTA ══════════════ -->
+<section id="contacto">
+  <div class="cta-wrap">
+    <span class="cta-icon">💬</span>
+    <h2 class="cta-title">¿Listo para tu<br><span>próximo equipo?</span></h2>
+    <p class="cta-sub">
+      Escríbenos por WhatsApp, dinos qué necesitas y te asesoramos sin compromiso. Respondemos en menos de 2 horas en días hábiles.
+    </p>
+    <a href="https://wa.me/59175223813?text=Hola%20YaraTech!%20Me%20interesa%20saber%20m%C3%A1s%20sobre%20sus%20productos." target="_blank" class="btn-whatsapp">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Chatear por WhatsApp
+    </a>
+    <p class="wa-number"><strong>+591 7522 3813</strong> · Habner Mollo · YaraTech Bolivia</p>
+  </div>
+</section>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer>
+  <a href="#inicio" class="foot-logo">Yara<span>Tech</span></a>
+  <div class="foot-info">
+    Hub Digital de Gestión Empresarial · Tarea Grupal<br>
+    Universidad Mayor de San Andrés (UMSA) · 2024–2025
+  </div>
+  <div class="foot-right">
+    <strong>YaraTech Bolivia</strong><br>
+    Caranavi, La Paz · Bolivia<br>
+    +591 7522 3813
+  </div>
+</footer>
+
+</body>
+</html>
