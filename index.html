@@ -741,6 +741,292 @@ footer {
   footer { padding:30px 24px; flex-direction:column; text-align:center; }
   .foot-right { text-align:center; }
 }
+
+/* ═══════════════════════════════════════════
+   CATÁLOGO DE PRODUCTOS
+═══════════════════════════════════════════ */
+#catalogo { background: var(--dark); }
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+}
+.product-card {
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: 24px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.product-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(200,241,53,0.3), transparent 40%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.product-card:hover {
+  transform: translateY(-12px);
+  border-color: rgba(200,241,53,0.4);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+}
+.product-card:hover::before { opacity: 1; }
+
+.product-img-wrap {
+  width: 100%;
+  aspect-ratio: 16/11;
+  overflow: hidden;
+  position: relative;
+}
+.product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s;
+}
+.product-card:hover .product-img { transform: scale(1.1); }
+
+.product-info {
+  padding: 24px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+.product-cat {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--lime);
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+.product-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+.product-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.product-price {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--white);
+  margin-top: auto;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.product-price small { font-size: 14px; color: var(--lime); font-weight: 500; }
+
+.add-to-cart {
+  width: 100%;
+  padding: 14px;
+  background: var(--lime);
+  color: var(--dark);
+  border: none;
+  border-radius: 14px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.add-to-cart:hover {
+  background: var(--lime-dk);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(200,241,53,0.3);
+}
+
+/* ═══════════════════════════════════════════
+   UBICACIÓN
+═══════════════════════════════════════════ */
+#ubicacion { background: var(--dark2); }
+.map-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 40px;
+  align-items: center;
+}
+.map-info {
+  background: var(--panel);
+  padding: 40px;
+  border-radius: 24px;
+  border: 1px solid var(--border2);
+}
+.map-container {
+  width: 100%;
+  height: 480px;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  position: relative;
+}
+.map-container iframe { width: 100%; height: 100%; border:0; filter: grayscale(1) invert(0.9) contrast(1.2); }
+
+/* ═══════════════════════════════════════════
+   CARRITO UI
+═══════════════════════════════════════════ */
+.cart-trigger {
+  position: fixed;
+  bottom: 100px;
+  right: 30px;
+  z-index: 301;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--lime);
+  color: var(--dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 40px rgba(200,241,53,0.4);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.cart-trigger:hover { transform: scale(1.1) rotate(5deg); }
+.cart-count {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #FF4B2B;
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--lime);
+}
+.cart-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(8px);
+  z-index: 399;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.cart-overlay.open { opacity: 1; pointer-events: auto; }
+
+.cart-panel {
+  position: fixed;
+  top: 0;
+  right: -420px;
+  width: 400px;
+  height: 100vh;
+  background: var(--panel2);
+  z-index: 400;
+  box-shadow: -20px 0 60px rgba(0,0,0,0.6);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+}
+.cart-panel.open { right: 0; }
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+.cart-header h3 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; }
+.close-cart { 
+  width: 40px; height: 40px; 
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+  cursor: pointer; color: var(--muted); 
+  transition: all 0.2s;
+}
+.close-cart:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+
+.cart-items { flex-grow: 1; overflow-y: auto; padding-right: 10px; }
+.cart-items::-webkit-scrollbar { width: 4px; }
+.cart-items::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.cart-item {
+  display: flex;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border2);
+  animation: slideIn 0.3s ease-out forwards;
+}
+@keyframes slideIn { from{opacity:0; transform:translateX(20px)} to{opacity:1; transform:translateX(0)} }
+
+.cart-item-info { flex-grow: 1; }
+.cart-item-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+.cart-item-price { color: var(--lime); font-weight: 700; font-size: 14px; }
+.remove-item { 
+  color: var(--dim); cursor: pointer; font-size: 11px; 
+  text-transform: uppercase; letter-spacing: 1px; margin-top: 8px;
+  display: inline-block; transition: color 0.2s;
+}
+.remove-item:hover { color: #FF4B2B; }
+
+.cart-footer { margin-top: 40px; border-top: 1px solid var(--border); padding-top: 30px; }
+.cart-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.total-label { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.total-amount { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--lime); }
+
+.btn-checkout {
+  width: 100%;
+  padding: 18px;
+  background: var(--wa);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.3s;
+}
+.btn-checkout:hover { 
+  background: #1da851; 
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(37,211,102,0.3);
+}
+
+@media(max-width: 700px) {
+  .cart-panel { width: 100%; right: -100%; }
+  .map-wrap { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -759,6 +1045,7 @@ footer {
     <a href="#nosotros">Nosotros</a>
     <a href="#operaciones">Operaciones</a>
     <a href="#ecosistema">Ecosistema</a>
+    <a href="#catalogo">Catálogo</a>
     <a href="https://wa.me/59175223813" target="_blank" class="nav-wa">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       WhatsApp
@@ -1261,6 +1548,127 @@ footer {
   </div>
 </section>
 
+
+<div class="divider"></div>
+
+<!-- ══════════════ CATÁLOGO ══════════════ -->
+<section id="catalogo">
+  <div class="section-wrap">
+    <div class="s-eyebrow">Stock exclusivo</div>
+    <h2 class="s-title">Catálogo YaraTech</h2>
+    <p class="s-sub">Equipos seleccionados con los más altos estándares de calidad. Listos para entrega inmediata.</p>
+
+    <div class="product-grid">
+      <!-- Producto 1 -->
+      <div class="product-card">
+        <div class="product-img-wrap">
+          <img src="assets/img/gaming-laptop.png" alt="Gaming Pro X1" class="product-img">
+        </div>
+        <div class="product-info">
+          <span class="product-cat">Gaming / Alto Rendimiento</span>
+          <h3 class="product-name">YaraTech Gaming Pro X1</h3>
+          <p class="product-desc">Ryzen 7, 16GB RAM, 512GB SSD, RTX 3060. Diseñada para dominar cualquier juego.</p>
+          <div class="product-price"><small>Bs.</small> 8,450</div>
+          <button class="add-to-cart" onclick="addToCart('Gaming Pro X1', 8450)">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 4v16m8-8H4"/></svg>
+            Añadir al carrito
+          </button>
+        </div>
+      </div>
+
+      <!-- Producto 2 -->
+      <div class="product-card">
+        <div class="product-img-wrap">
+          <img src="assets/img/office-laptop.png" alt="Office Ultra" class="product-img">
+        </div>
+        <div class="product-info">
+          <span class="product-cat">Productividad / Slim</span>
+          <h3 class="product-name">Laptop Office Ultra Slim</h3>
+          <p class="product-desc">Core i5 12va Gen, 8GB RAM, 256GB SSD. La aliada perfecta para tus estudios y oficina.</p>
+          <div class="product-price"><small>Bs.</small> 4,200</div>
+          <button class="add-to-cart" onclick="addToCart('Office Ultra Slim', 4200)">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 4v16m8-8H4"/></svg>
+            Añadir al carrito
+          </button>
+        </div>
+      </div>
+
+      <!-- Producto 3 -->
+      <div class="product-card">
+        <div class="product-img-wrap">
+          <img src="assets/img/desktop-pc.png" alt="Master PC" class="product-img">
+        </div>
+        <div class="product-info">
+          <span class="product-cat">Escritorio / Gaming</span>
+          <h3 class="product-name">PC Desktop Master Build</h3>
+          <h3 class="product-name">PC Desktop Master Build</h3>
+          <p class="product-desc">Ensamblado premium con refrigeración líquida. Personalizable según tus necesidades.</p>
+          <div class="product-price"><small>Bs.</small> 6,800</div>
+          <button class="add-to-cart" onclick="addToCart('PC Desktop Master', 6800)">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 4v16m8-8H4"/></svg>
+            Añadir al carrito
+          </button>
+        </div>
+      </div>
+
+      <!-- Producto 4 -->
+      <div class="product-card">
+        <div class="product-img-wrap">
+          <img src="assets/img/workstation-pc.png" alt="Workstation Z" class="product-img">
+        </div>
+        <div class="product-info">
+          <span class="product-cat">Profesional / Workstation</span>
+          <h3 class="product-name">Workstation YaraTech Z-9</h3>
+          <p class="product-desc">Máxima potencia para renderizado y edición de video. Pantalla 4K incluida.</p>
+          <div class="product-price"><small>Bs.</small> 12,500</div>
+          <button class="add-to-cart" onclick="addToCart('Workstation Z-9', 12500)">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 4v16m8-8H4"/></svg>
+            Añadir al carrito
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════ UBICACIÓN ══════════════ -->
+<section id="ubicacion">
+  <div class="section-wrap">
+    <div class="s-eyebrow">Visítanos</div>
+    <h2 class="s-title">Nuestra Ubicación</h2>
+    <p class="s-sub">Encuéntranos en el corazón de Caranavi. Estamos listos para atenderte personalmente.</p>
+
+    <div class="map-wrap">
+      <div class="map-info">
+        <div class="srv-icon" style="margin-bottom: 24px;">📍</div>
+        <h3 style="font-family:'Syne',sans-serif; font-size: 24px; margin-bottom: 16px;">Sede Central Caranavi</h3>
+        <p style="color: var(--muted); line-height: 1.8; margin-bottom: 24px;">
+          Ubicados estratégicamente para servir a toda la región del norte paceño. <br>
+          <strong>Coordenadas:</strong> -15.833148, -67.567201
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div class="feat-pill" style="border-color: var(--border2);">
+            <span style="color: var(--lime);">🕒</span> Lun - Sáb: 09:00 - 19:00
+          </div>
+          <div class="feat-pill" style="border-color: var(--border2);">
+            <span style="color: var(--lime);">📞</span> +591 7522 3813
+          </div>
+        </div>
+      </div>
+      <div class="map-container">
+        <iframe 
+          src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3835.452381254308!2d-67.567201!3d-15.833148!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses!2sbo!4v1714850000000!5m2!1ses!2sbo" 
+          allowfullscreen="" 
+          loading="lazy" 
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
 <div class="divider"></div>
 
 <!-- ══════════════ CONTACTO / WA CTA ══════════════ -->
@@ -1292,6 +1700,128 @@ footer {
     +591 7522 3813
   </div>
 </footer>
+
+<!-- ══════════════ CARRITO OVERLAY & PANEL ══════════════ -->
+<div class="cart-trigger" onclick="toggleCart()">
+  <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+  <div class="cart-count" id="cart-count">0</div>
+</div>
+
+<div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+
+<div class="cart-panel" id="cart-panel">
+  <div class="cart-header">
+    <h3>Tu Pedido</h3>
+    <div class="close-cart" onclick="toggleCart()">✕</div>
+  </div>
+  
+  <div class="cart-items" id="cart-items">
+    <!-- Items dinámicos -->
+    <div style="text-align:center; padding-top: 40px; color: var(--dim);">
+      <p>Tu carrito está vacío</p>
+    </div>
+  </div>
+
+  <div class="cart-footer">
+    <div class="cart-total-row">
+      <span class="total-label">Total estimado</span>
+      <span class="total-amount" id="cart-total">Bs. 0</span>
+    </div>
+    <button class="btn-checkout" onclick="checkoutWhatsApp()">
+      <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Pedir por WhatsApp
+    </button>
+  </div>
+</div>
+
+<script>
+  let cart = [];
+  
+  function toggleCart() {
+    document.getElementById('cart-panel').classList.toggle('open');
+    document.getElementById('cart-overlay').classList.toggle('open');
+  }
+
+  function addToCart(name, price) {
+    cart.push({ name, price, id: Date.now() });
+    updateCartUI();
+    
+    // Feedback visual
+    const trigger = document.querySelector('.cart-trigger');
+    trigger.style.transform = 'scale(1.2)';
+    setTimeout(() => trigger.style.transform = '', 200);
+    
+    // Notificación simple si no está abierto el carrito
+    if(!document.getElementById('cart-panel').classList.contains('open')) {
+      // Opcional: mostrar un mini toast o abrir el carrito
+    }
+  }
+
+  function removeFromCart(id) {
+    cart = cart.filter(item => item.id !== id);
+    updateCartUI();
+  }
+
+  function updateCartUI() {
+    const cartItems = document.getElementById('cart-items');
+    const cartCount = document.getElementById('cart-count');
+    const cartTotal = document.getElementById('cart-total');
+    
+    cartCount.innerText = cart.length;
+    
+    if (cart.length === 0) {
+      cartItems.innerHTML = `
+        <div style="text-align:center; padding-top: 40px; color: var(--dim);">
+          <p>Tu carrito está vacío</p>
+        </div>
+      `;
+      cartTotal.innerText = 'Bs. 0';
+      return;
+    }
+
+    let total = 0;
+    cartItems.innerHTML = '';
+    
+    cart.forEach(item => {
+      total += item.price;
+      const div = document.createElement('div');
+      div.className = 'cart-item';
+      div.innerHTML = `
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">Bs. ${item.price.toLocaleString()}</div>
+          <span class="remove-item" onclick="removeFromCart(${item.id})">Eliminar</span>
+        </div>
+      `;
+      cartItems.appendChild(div);
+    });
+    
+    cartTotal.innerText = `Bs. ${total.toLocaleString()}`;
+  }
+
+  function checkoutWhatsApp() {
+    if (cart.length === 0) {
+      alert('Tu carrito está vacío');
+      return;
+    }
+
+    let message = "¡Hola YaraTech! 👋 Me gustaría realizar un pedido de los siguientes equipos:\n\n";
+    let total = 0;
+    
+    cart.forEach((item, index) => {
+      message += `${index + 1}. *${item.name}* - Bs. ${item.price.toLocaleString()}\n`;
+      total += item.price;
+    });
+    
+    message += `\n*Total estimado: Bs. ${total.toLocaleString()}*\n\n`;
+    message += "Por favor, confírmenme la disponibilidad para coordinar el envío. ¡Gracias!";
+    
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/59175223813?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, '_blank');
+  }
+</script>
 
 </body>
 </html>
