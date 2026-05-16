@@ -13,6 +13,8 @@
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --bg-body: #F0F2F5;
@@ -730,33 +732,43 @@
             .view { padding: 1rem; padding-bottom: 80px; }
             header { padding: 0 1rem; }
             .header-status .btn-header { display: none; }
-        }
-
+            .brand-info p { display: none; }
+            
             .product-grid {
-                grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
-                gap: 0.75rem;
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 1rem;
             }
-
-            .product-card {
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .page-header > div {
+                width: 100%;
+                justify-content: space-between;
+                display: flex;
+                gap: 8px;
+            }
+            
+            .data-table-container {
                 border-radius: 12px;
             }
-
-            .product-img {
-                height: 140px;
+            
+            .data-table th, .data-table td {
+                padding: 12px 10px;
+                font-size: 0.8rem;
             }
 
-            .product-info {
-                padding: 0.75rem;
-            }
-
-            /* Mobile Cart as Overlay */
+            /* Mobile Cart Overlay */
             .cart-section {
                 position: fixed;
                 top: 0;
                 right: -100%;
                 width: 100%;
                 height: 100vh;
-                z-index: 1000;
+                z-index: 2000;
                 border-radius: 0;
                 transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
@@ -765,27 +777,13 @@
                 right: 0;
             }
 
-            .cart-header {
-                padding: 1rem;
-            }
-
-            .cart-items {
-                padding: 0.75rem;
-            }
-
-            .cart-summary {
-                padding: 1rem;
-                padding-bottom: 2rem;
-            }
-
-            /* Cart Toggle Button (Floating or in Header) */
             #mobile-cart-toggle {
                 display: flex !important;
                 position: fixed;
-                bottom: 20px;
+                bottom: 80px;
                 right: 20px;
-                width: 60px;
-                height: 60px;
+                width: 56px;
+                height: 56px;
                 border-radius: 50%;
                 background: var(--primary);
                 color: white;
@@ -803,19 +801,41 @@
                 right: -5px;
                 background: var(--danger);
                 color: white;
-                font-size: 0.7rem;
-                font-weight: 800;
-                width: 24px;
-                height: 24px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
                 justify-content: center;
                 border: 2px solid white;
             }
 
-            #close-cart-mobile {
-                display: block !important;
+            /* Modals Mobile */
+            .modal-content {
+                width: 95%;
+                max-width: none;
+                margin: 10px;
+                padding: 1.5rem;
+                border-radius: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            
+            .product-img {
+                height: 120px;
+            }
+            
+            .product-name {
+                font-size: 0.85rem;
+                height: 2.1rem;
+            }
+            
+            .product-price {
+                font-size: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.25rem;
             }
         }
 
@@ -1019,72 +1039,78 @@
         }
 
         .ticket {
-            width: 70mm;
+            width: 72mm;
             margin: 0 auto;
-            font-size: 12px;
-            line-height: 1.4;
+            font-size: 11px;
+            line-height: 1.2;
+            font-family: 'Courier New', Courier, monospace;
+            color: #000;
         }
 
         .ticket-header {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             border-bottom: 1px dashed #000;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
         }
 
         .ticket-logo {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 900;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
 
         .ticket-info {
-            font-size: 10px;
-            color: #333;
+            font-size: 9px;
+            color: #000;
         }
 
         .ticket-table {
             width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             border-collapse: collapse;
         }
 
         .ticket-table th {
             text-align: left;
             border-bottom: 1px solid #000;
-            font-size: 10px;
-            padding: 4px 0;
+            font-size: 9px;
+            padding: 3px 0;
         }
 
         .ticket-table td {
-            padding: 4px 0;
-            font-size: 11px;
+            padding: 3px 0;
+            font-size: 10px;
+            vertical-align: top;
         }
 
         .ticket-total-section {
             border-top: 1px dashed #000;
-            padding-top: 10px;
-            margin-bottom: 15px;
+            padding-top: 8px;
+            margin-bottom: 10px;
         }
 
         .ticket-total-row {
             display: flex;
             justify-content: space-between;
-            font-size: 11px;
+            font-size: 10px;
+            margin-bottom: 2px;
         }
 
         .ticket-total-row.grand-total {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 900;
-            margin-top: 5px;
+            margin-top: 4px;
+            border-top: 1px solid #000;
+            padding-top: 4px;
         }
 
         .ticket-footer {
             text-align: center;
-            font-size: 10px;
-            margin-top: 20px;
-            border-top: 1px solid #000;
-            padding-top: 10px;
+            font-size: 9px;
+            margin-top: 15px;
+            border-top: 1px dashed #000;
+            padding-top: 8px;
         }
     </style>
 </head>
@@ -1184,7 +1210,17 @@
         <section class="inventory-section">
             <div class="search-bar">
                 <i data-lucide="search"></i>
-                <input type="text" id="product-search" placeholder="Buscar por nombre, código o categoría...">
+                <input type="text" id="product-search" placeholder="Buscar por nombre, código o categoría..." onkeydown="handleBarcodeSearch(event)">
+            </div>
+
+            <!-- Category Filters -->
+            <div class="category-filters" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px;">
+                <button class="filter-btn active" onclick="filterByCategory('all')">Todo</button>
+                <button class="filter-btn" onclick="filterByCategory('Celulares')">Celulares</button>
+                <button class="filter-btn" onclick="filterByCategory('Tablets')">Tablets</button>
+                <button class="filter-btn" onclick="filterByCategory('Audio')">Audio</button>
+                <button class="filter-btn" onclick="filterByCategory('Laptops')">Laptops</button>
+                <button class="filter-btn" onclick="filterByCategory('Accesorios')">Accesorios</button>
             </div>
 
             <div class="product-grid" id="product-grid">
@@ -1232,8 +1268,8 @@
 
                 <div class="cart-actions">
                     <button class="btn btn-outline" onclick="openDiscountModal()"><i data-lucide="tag"></i> Descuento</button>
-                    <button class="btn btn-outline" onclick="suspendSale()"><i data-lucide="pause-circle"></i> Suspender</button>
-                    <button class="btn btn-primary" onclick="openCheckoutModal()"><i data-lucide="credit-card"></i> FINALIZAR VENTA / COBRAR</button>
+                    <button class="btn btn-outline" onclick="clearCart()"><i data-lucide="trash-2"></i> Vaciar</button>
+                    <button class="btn btn-primary" onclick="openCheckoutModal()"><i data-lucide="credit-card"></i> FINALIZAR VENTA / COBRAR (F2)</button>
                 </div>
             </div>
                     </div>
@@ -1244,9 +1280,14 @@
             <section id="view-inventory" class="view">
                 <div class="page-header">
                     <h2 class="page-title">Gestión de Inventario</h2>
-                    <button class="btn btn-primary" style="padding: 10px 20px; font-size: 0.9rem;" onclick="openAddProductModal()">
-                        <i data-lucide="plus-circle"></i> Nuevo Producto
-                    </button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-outline" onclick="exportInventory()"><i data-lucide="download"></i> Exportar</button>
+                        <button class="btn btn-outline" onclick="triggerImport()"><i data-lucide="upload"></i> Importar CSV</button>
+                        <button class="btn btn-primary" style="padding: 10px 20px; font-size: 0.9rem;" onclick="openAddProductModal()">
+                            <i data-lucide="plus-circle"></i> Nuevo Producto
+                        </button>
+                    </div>
+                    <input type="file" id="import-input" style="display: none;" accept=".csv,.xlsx,.xls" onchange="handleImport(this)">
                 </div>
                 
                 <div class="search-bar" style="margin-bottom: 1.5rem;">
@@ -1327,6 +1368,7 @@
                             <tr>
                                 <th>Razón Social / Nombre</th>
                                 <th>NIT / CI</th>
+                                <th>Teléfono</th>
                                 <th>Sector Industrial</th>
                                 <th>Dirección</th>
                                 <th style="text-align: right;">Acciones</th>
@@ -1359,6 +1401,7 @@
                             <tr>
                                 <th>Marca / Empresa</th>
                                 <th>Contacto</th>
+                                <th>Teléfono</th>
                                 <th>Categoría</th>
                                 <th>Email</th>
                                 <th style="text-align: right;">Acciones</th>
@@ -1518,22 +1561,43 @@
             
             <input type="hidden" id="product-id">
             
-            <div class="modal-input-group">
-                <label for="product-name">Nombre del Producto</label>
-                <input type="text" id="product-name" class="modal-input" placeholder="Ej: Smartphone Galaxy S23">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left;">
+                <div class="modal-input-group">
+                    <label for="product-name">Nombre del Producto</label>
+                    <input type="text" id="product-name" class="modal-input" placeholder="Ej: Smartphone Galaxy S23">
+                </div>
+                <div class="modal-input-group">
+                    <label for="product-code">Código de Barras</label>
+                    <input type="text" id="product-code" class="modal-input" placeholder="750123456789">
+                </div>
             </div>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left; margin-bottom: 2rem;">
-                <div class="modal-input-group" style="margin-bottom: 0;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left; margin-bottom: 1rem;">
+                <div class="modal-input-group">
                     <label for="product-category">Categoría</label>
-                    <select id="product-category" class="modal-input" style="appearance: auto;">
+                    <select id="product-category" class="modal-input">
                         <option value="Celulares">Celulares</option>
                         <option value="Tablets">Tablets</option>
                         <option value="Audio">Audio</option>
                         <option value="Laptops">Laptops</option>
                         <option value="Accesorios">Accesorios</option>
+                        <option value="Wearables">Wearables</option>
+                        <option value="Monitores">Monitores</option>
                     </select>
                 </div>
+                <div class="modal-input-group">
+                    <label for="product-supplier">Proveedor</label>
+                    <select id="product-supplier" class="modal-input">
+                        <option value="Samsung Electronics">Samsung Electronics</option>
+                        <option value="Sony Music & Tech">Sony Music & Tech</option>
+                        <option value="MSI Global">MSI Global</option>
+                        <option value="Logitech Global">Logitech Global</option>
+                        <option value="N/A">N/A</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left; margin-bottom: 2rem;">
                 <div class="modal-input-group" style="margin-bottom: 0;">
                     <label for="product-price">Precio (BS)</label>
                     <input type="number" id="product-price" class="modal-input" placeholder="0.00">
@@ -1562,24 +1626,31 @@
             
             <input type="hidden" id="client-id">
 
-            <div class="modal-input-group">
-                <label for="client-name">Razón Social / Nombre</label>
-                <input type="text" id="client-name" class="modal-input" placeholder="Ej: Juan Pérez">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left;">
+                <div class="modal-input-group">
+                    <label for="client-name">Nombre Completo / Razón Social</label>
+                    <input type="text" id="client-name" class="modal-input" placeholder="Ej: Juan Pérez">
+                </div>
+                <div class="modal-input-group">
+                    <label for="client-nit">NIT / CI</label>
+                    <input type="text" id="client-nit" class="modal-input" placeholder="123456789">
+                </div>
             </div>
 
-            <div class="modal-input-group">
-                <label for="client-nit">NIT / CI</label>
-                <input type="text" id="client-nit" class="modal-input" placeholder="Ej: 12345678">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left;">
+                <div class="modal-input-group">
+                    <label for="client-phone">Teléfono / WhatsApp</label>
+                    <input type="text" id="client-phone" class="modal-input" placeholder="+591 70000000">
+                </div>
+                <div class="modal-input-group">
+                    <label for="client-sector">Sector / Tipo</label>
+                    <input type="text" id="client-sector" class="modal-input" placeholder="Ej: Retail, Distribución">
+                </div>
             </div>
-
-            <div class="modal-input-group">
+            
+            <div class="modal-input-group" style="text-align: left;">
                 <label for="client-address">Dirección</label>
-                <input type="text" id="client-address" class="modal-input" placeholder="Ej: Av. 6 de Agosto #123">
-            </div>
-
-            <div class="modal-input-group">
-                <label for="client-sector">Sector Industrial</label>
-                <input type="text" id="client-sector" class="modal-input" placeholder="Ej: Retail, Distribución">
+                <input type="text" id="client-address" class="modal-input" placeholder="Av. Principal #123">
             </div>
 
             <div class="modal-buttons">
@@ -1622,24 +1693,33 @@
             <h2 class="modal-title" id="supplier-modal-title">Nuevo Proveedor</h2>
             <p class="modal-subtitle">Registro de marca o empresa proveedora</p>
             
-            <div class="modal-input-group">
-                <label for="supplier-name">Nombre / Empresa</label>
-                <input type="text" id="supplier-name" class="modal-input" placeholder="Ej: Samsung Electronics">
+            <input type="hidden" id="supplier-id">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left;">
+                <div class="modal-input-group">
+                    <label for="supplier-name">Nombre / Empresa</label>
+                    <input type="text" id="supplier-name" class="modal-input" placeholder="Ej: Samsung Electronics">
+                </div>
+                <div class="modal-input-group">
+                    <label for="supplier-contact">Nombre de Contacto</label>
+                    <input type="text" id="supplier-contact" class="modal-input" placeholder="Ej: Ing. Marco Polo">
+                </div>
             </div>
 
-            <div class="modal-input-group">
-                <label for="supplier-contact">Nombre de Contacto</label>
-                <input type="text" id="supplier-contact" class="modal-input" placeholder="Ej: Juan Pérez">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left;">
+                <div class="modal-input-group">
+                    <label for="supplier-phone">Teléfono de Contacto</label>
+                    <input type="text" id="supplier-phone" class="modal-input" placeholder="+591 70000000">
+                </div>
+                <div class="modal-input-group">
+                    <label for="supplier-category">Categoría Proveedor</label>
+                    <input type="text" id="supplier-category" class="modal-input" placeholder="Ej: Hardware, Software">
+                </div>
             </div>
 
-            <div class="modal-input-group">
-                <label for="supplier-category">Categoría de Productos</label>
-                <input type="text" id="supplier-category" class="modal-input" placeholder="Ej: Celulares, Audio">
-            </div>
-
-            <div class="modal-input-group">
+            <div class="modal-input-group" style="text-align: left;">
                 <label for="supplier-email">Correo Electrónico</label>
-                <input type="email" id="supplier-email" class="modal-input" placeholder="proveedor@empresa.com">
+                <input type="email" id="supplier-email" class="modal-input" placeholder="contacto@empresa.com">
             </div>
 
             <div class="modal-buttons">
@@ -1679,14 +1759,14 @@
     <script>
         // --- DATA ---
         const PRODUCTS = [
-            { id: 1, name: 'Smartphone Pro X - 256GB', category: 'Celulares', price: 2499, image: 'smartphone.png', stock: 15 },
-            { id: 2, name: 'Tablet Pro 10" OLED', category: 'Tablets', price: 1850, image: 'tablet.png', stock: 8 },
-            { id: 3, name: 'Audífonos Bluetooth ANC', category: 'Audio', price: 580, image: 'headphones.png', stock: 25 },
-            { id: 4, name: 'Laptop Gamer RTX 4060', category: 'Laptops', price: 7200, image: 'laptop.png', stock: 5 },
-            { id: 5, name: 'Smartwatch Series 7', category: 'Wearables', price: 1200, image: 'https://images.unsplash.com/photo-1544117519-31a4b719223d?auto=format&fit=crop&q=80&w=300', stock: 12 },
-            { id: 6, name: 'Monitor 4K UltraWide 34"', category: 'Monitores', price: 3450, image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&q=80&w=300', stock: 7 },
-            { id: 7, name: 'Teclado Mecánico RGB', category: 'Accesorios', price: 450, image: 'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&q=80&w=300', stock: 30 },
-            { id: 8, name: 'Mouse Inalámbrico Pro', category: 'Accesorios', price: 280, image: 'https://images.unsplash.com/photo-1527866959252-deab85ef7d1b?auto=format&fit=crop&q=80&w=300', stock: 45 }
+            { id: 1, name: 'Smartphone Pro X - 256GB', code: '7501001', category: 'Celulares', price: 2499, image: 'smartphone.png', stock: 15, supplier: 'Samsung Electronics' },
+            { id: 2, name: 'Tablet Pro 10" OLED', code: '7501002', category: 'Tablets', price: 1850, image: 'tablet.png', stock: 8, supplier: 'Samsung Electronics' },
+            { id: 3, name: 'Audífonos Bluetooth ANC', code: '7501003', category: 'Audio', price: 580, image: 'headphones.png', stock: 25, supplier: 'Sony Music & Tech' },
+            { id: 4, name: 'Laptop Gamer RTX 4060', code: '7501004', category: 'Laptops', price: 7200, image: 'laptop.png', stock: 5, supplier: 'MSI Global' },
+            { id: 5, name: 'Smartwatch Series 7', code: '7501005', category: 'Wearables', price: 1200, image: 'https://images.unsplash.com/photo-1544117519-31a4b719223d?auto=format&fit=crop&q=80&w=300', stock: 12, supplier: 'Samsung Electronics' },
+            { id: 6, name: 'Monitor 4K UltraWide 34"', code: '7501006', category: 'Monitores', price: 3450, image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&q=80&w=300', stock: 7, supplier: 'Sony Music & Tech' },
+            { id: 7, name: 'Teclado Mecánico RGB', code: '7501007', category: 'Accesorios', price: 450, image: 'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&q=80&w=300', stock: 30, supplier: 'Logitech Global' },
+            { id: 8, name: 'Mouse Inalámbrico Pro', code: '7501008', category: 'Accesorios', price: 280, image: 'https://images.unsplash.com/photo-1527866959252-deab85ef7d1b?auto=format&fit=crop&q=80&w=300', stock: 45, supplier: 'Logitech Global' }
         ];
 
         let cart = [];
@@ -1694,16 +1774,16 @@
         let suspendedSales = [];
         
         const CLIENTS = [
-            { id: 1, name: 'ElectroWorld S.A.', nit: '1029384756', address: 'Av. 6 de Agosto', sector: 'Retail' },
-            { id: 2, name: 'Importadora Yungas', nit: '4958673012', address: 'Calle Junín #45', sector: 'Distribución' },
-            { id: 3, name: 'Juan Pérez (Consumidor)', nit: '1234567', address: 'Caranavi Centro', sector: 'Independiente' }
+            { id: 1, name: 'ElectroWorld S.A.', nit: '1029384756', phone: '+591 71234567', address: 'Av. 6 de Agosto', sector: 'Retail' },
+            { id: 2, name: 'Importadora Yungas', nit: '4958673012', phone: '+591 72345678', address: 'Calle Junín #45', sector: 'Distribución' },
+            { id: 3, name: 'Juan Pérez (Consumidor)', nit: '1234567', phone: '+591 73456789', address: 'Caranavi Centro', sector: 'Independiente' }
         ];
 
         const SUPPLIERS = [
-            { id: 1, name: 'Samsung Electronics', contact: 'Juan Carlos Mamani', category: 'Smartphones/TV', email: 'ventas@samsung.bo' },
-            { id: 2, name: 'Xiaomi Bolivia', contact: 'Elena Quispe', category: 'Gadgets', email: 'contacto@xiaomi.com.bo' },
-            { id: 3, name: 'Sony Music & Tech', contact: 'Roberto Gómez', category: 'Audio/Video', email: 'roberto@sony.bo' },
-            { id: 4, name: 'Logitech Global', contact: 'Maria Delgado', category: 'Accesorios', email: 'm.delgado@logitech.com' }
+            { id: 1, name: 'Samsung Electronics', contact: 'Juan Carlos Mamani', phone: '+591 74567890', category: 'Smartphones/TV', email: 'ventas@samsung.bo' },
+            { id: 2, name: 'Xiaomi Bolivia', contact: 'Elena Quispe', phone: '+591 75678901', category: 'Gadgets', email: 'contacto@xiaomi.com.bo' },
+            { id: 3, name: 'Sony Music & Tech', contact: 'Roberto Gómez', phone: '+591 76789012', category: 'Audio/Video', email: 'roberto@sony.bo' },
+            { id: 4, name: 'Logitech Global', contact: 'Maria Delgado', phone: '+591 77890123', category: 'Accesorios', email: 'm.delgado@logitech.com' }
         ];
 
         let salesHistory = [
@@ -1951,7 +2031,7 @@
 
             summarySubtotal.innerText = `${subtotal.toFixed(2)} BS`;
             summaryTax.innerText = `${tax.toFixed(2)} BS`;
-            summaryDiscount.innerText = `-${discount.toFixed(2)} BS`;
+            summaryDiscount.innerText = discount > 0 ? `-${discount.toFixed(2)} BS` : `0.00 BS`;
             summaryTotal.innerText = `${total.toFixed(2)} BS`;
 
             // Update mobile badge
@@ -2047,7 +2127,8 @@
                 id: Date.now(),
                 date: ticketData.date,
                 clientName: clientName,
-                items: cart.reduce((a, b) => a + b.quantity, 0),
+                itemsCount: cart.reduce((a, b) => a + b.quantity, 0),
+                items: [...cart], // Store actual items
                 total: total,
                 method: 'Tienda',
                 status: 'Completado'
@@ -2224,9 +2305,47 @@
             const term = e.target.value.toLowerCase();
             const filtered = PRODUCTS.filter(p => 
                 p.name.toLowerCase().includes(term) || 
-                p.category.toLowerCase().includes(term)
+                p.category.toLowerCase().includes(term) ||
+                (p.code && p.code.toLowerCase().includes(term))
             );
             renderProducts(filtered);
+        });
+
+        window.handleBarcodeSearch = function(event) {
+            if (event.key === 'Enter') {
+                const term = event.target.value.trim();
+                const product = PRODUCTS.find(p => p.code === term || p.id.toString() === term);
+                if (product) {
+                    addToCart(product.id);
+                    event.target.value = '';
+                    showNotification(`Producto añadido: ${product.name}`);
+                }
+            }
+        };
+
+        window.filterByCategory = function(category) {
+            const buttons = document.querySelectorAll('.category-filters .filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (category === 'all') {
+                renderProducts(PRODUCTS);
+            } else {
+                const filtered = PRODUCTS.filter(p => p.category === category);
+                renderProducts(filtered);
+            }
+        };
+
+        // Keyboard Shortcuts
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'F2') {
+                e.preventDefault();
+                openCheckoutModal();
+            }
+            if (e.key === 'F4') {
+                e.preventDefault();
+                searchInput.focus();
+            }
         });
 
         // --- INVENTORY MANAGEMENT LOGIC ---
@@ -2293,7 +2412,7 @@
                 tr.innerHTML = `
                     <td>
                         <div style="font-weight:600;">${p.name}</div>
-                        <div style="font-size:0.75rem; color:var(--text-muted);">REF: #00${p.id}</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">CODE: ${p.code || 'N/A'} | REF: #00${p.id}</div>
                     </td>
                     <td>${p.category}</td>
                     <td style="font-weight:600;">${p.price.toFixed(2)} BS</td>
@@ -2307,7 +2426,8 @@
                         </span>
                     </td>
                     <td style="text-align: right;">
-                        <button class="qty-btn" onclick="openInventoryModal()" title="Editar Stock"><i data-lucide="edit-3"></i></button>
+                        <button class="qty-btn" onclick="openEditProductModal(${p.id})" title="Editar Producto"><i data-lucide="edit"></i></button>
+                        <button class="qty-btn" onclick="openInventoryModal()" title="Editar Stock Rápido"><i data-lucide="package"></i></button>
                     </td>
                 `;
                 body.appendChild(tr);
@@ -2359,11 +2479,12 @@
                         <div style="font-weight:600;">${c.name}</div>
                     </td>
                     <td>${c.nit}</td>
+                    <td><a href="tel:${c.phone}" style="color:var(--primary); text-decoration:none; font-weight:600;">${c.phone}</a></td>
                     <td><span style="background:#F1F5F9; padding:4px 8px; border-radius:6px; font-size:0.75rem;">${c.sector}</span></td>
                     <td style="font-size:0.85rem; color:var(--text-muted);">${c.address}</td>
                     <td style="text-align: right;">
-                        <button class="qty-btn" title="Editar"><i data-lucide="edit"></i></button>
-                        <button class="qty-btn" title="Ventas"><i data-lucide="shopping-bag"></i></button>
+                        <button class="qty-btn" onclick="openEditClientModal(${c.id})" title="Editar"><i data-lucide="edit"></i></button>
+                        <button class="qty-btn" onclick="viewClientSales('${c.name}')" title="Ver Ventas"><i data-lucide="shopping-bag"></i></button>
                     </td>
                 `;
                 body.appendChild(tr);
@@ -2383,11 +2504,12 @@
                         <div style="font-weight:600;">${s.name}</div>
                     </td>
                     <td>${s.contact}</td>
+                    <td><a href="https://wa.me/${s.phone.replace(/[^0-9]/g, '')}" target="_blank" style="color:var(--success); text-decoration:none; font-weight:600;">${s.phone}</a></td>
                     <td><span style="background:#E0F2FE; color:#0369A1; padding:4px 8px; border-radius:6px; font-size:0.75rem; font-weight:600;">${s.category}</span></td>
                     <td style="font-size:0.85rem; color:var(--text-muted);">${s.email}</td>
                     <td style="text-align: right;">
-                        <button class="qty-btn" title="Editar"><i data-lucide="edit"></i></button>
-                        <button class="qty-btn" title="Ver Productos"><i data-lucide="package"></i></button>
+                        <button class="qty-btn" onclick="openEditSupplierModal(${s.id})" title="Editar"><i data-lucide="edit"></i></button>
+                        <button class="qty-btn" onclick="viewSupplierProducts('${s.name}')" title="Ver Productos"><i data-lucide="package"></i></button>
                     </td>
                 `;
                 body.appendChild(tr);
@@ -2401,7 +2523,9 @@
             const filtered = PRODUCTS.filter(p => 
                 p.name.toLowerCase().includes(lowTerm) || 
                 p.category.toLowerCase().includes(lowTerm) ||
-                `#00${p.id}`.includes(lowTerm)
+                (p.supplier && p.supplier.toLowerCase().includes(lowTerm)) ||
+                `#00${p.id}`.includes(lowTerm) ||
+                (p.code && p.code.toLowerCase().includes(lowTerm))
             );
             const body = document.getElementById('inventory-table-body');
             body.innerHTML = '';
@@ -2411,7 +2535,7 @@
                 tr.innerHTML = `
                     <td>
                         <div style="font-weight:600;">${p.name}</div>
-                        <div style="font-size:0.75rem; color:var(--text-muted);">REF: #00${p.id}</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">CODE: ${p.code || 'N/A'} | REF: #00${p.id}</div>
                     </td>
                     <td>${p.category}</td>
                     <td style="font-weight:600;">${p.price.toFixed(2)} BS</td>
@@ -2521,13 +2645,158 @@
             lucide.createIcons();
         };
 
-        // --- EXPORT & MODALS ---
-        window.exportSales = function() { alert("Exportando datos a CSV..."); };
+        // --- EXPORT & IMPORT ---
+        window.exportSales = function() {
+            if (salesHistory.length === 0) {
+                alert("No hay ventas para exportar");
+                return;
+            }
+
+            const data = salesHistory.map(s => ({
+                'Fecha': s.date.toLocaleString(),
+                'Cliente': s.clientName || 'Consumidor Final',
+                'Items': s.itemsCount || (Array.isArray(s.items) ? s.items.reduce((a,b)=>a+b.quantity,0) : s.items),
+                'Total (BS)': s.total.toFixed(2),
+                'Método': s.method,
+                'Estado': s.status
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(data);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Ventas");
+            XLSX.writeFile(workbook, `Reporte_Ventas_YARA_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showNotification("Archivo Excel generado con éxito");
+        };
+
+        window.exportInventory = function() {
+            const data = PRODUCTS.map(p => ({
+                'ID': p.id,
+                'Código': p.code || '',
+                'Nombre': p.name,
+                'Categoría': p.category,
+                'Proveedor': p.supplier || 'N/A',
+                'Precio (BS)': p.price,
+                'Stock': p.stock
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(data);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Inventario");
+            XLSX.writeFile(workbook, `Inventario_YARA_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showNotification("Inventario exportado con éxito");
+        };
+
+        window.triggerImport = function() {
+            document.getElementById('import-input').click();
+        };
+
+        window.handleImport = function(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+                if (jsonData.length === 0) {
+                    alert("El archivo está vacío o no tiene el formato correcto.");
+                    return;
+                }
+
+                jsonData.forEach(row => {
+                    const existing = PRODUCTS.find(p => p.code === row['Código'] || p.name === row['Nombre']);
+                    if (existing) {
+                        existing.stock = parseInt(row['Stock']) || existing.stock;
+                        existing.price = parseFloat(row['Precio (BS)']) || existing.price;
+                    } else {
+                        PRODUCTS.push({
+                            id: PRODUCTS.length + 1,
+                            name: row['Nombre'] || 'Producto Nuevo',
+                            code: row['Código'] || '',
+                            category: row['Categoría'] || 'Varios',
+                            supplier: row['Proveedor'] || 'N/A',
+                            price: parseFloat(row['Precio (BS)']) || 0,
+                            stock: parseInt(row['Stock']) || 0,
+                            image: 'https://placehold.co/200x200?text=Importado'
+                        });
+                    }
+                });
+
+                showNotification(`${jsonData.length} productos procesados con éxito`);
+                renderInventoryView();
+                renderProducts(PRODUCTS);
+                input.value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        window.viewSupplierProducts = function(supplierName) {
+            switchView('view-inventory');
+            const searchInput = document.querySelector('#view-inventory .search-bar input');
+            searchInput.value = supplierName;
+            
+            // Trigger filtering
+            const filtered = PRODUCTS.filter(p => 
+                (p.supplier && p.supplier.toLowerCase().includes(supplierName.toLowerCase())) ||
+                p.name.toLowerCase().includes(supplierName.toLowerCase())
+            );
+            
+            const body = document.getElementById('inventory-table-body');
+            body.innerHTML = '';
+            filtered.forEach(p => {
+                // Reuse existing row generation logic (simplified for brevity or I could call a shared function)
+                // Better yet, just filter the existing view
+            });
+            // Actually, just calling filterInventory is easier if I update it to check supplier
+            filterInventory(supplierName);
+        };
+
+        window.viewClientSales = function(clientName) {
+            switchView('view-sales');
+            const searchInput = document.querySelector('#view-sales .search-bar input');
+            // If there's a search input in sales, use it. Currently it doesn't have one in the template I saw.
+            // Let's assume we filter the sales History.
+            
+            const periodBtns = document.querySelectorAll('#view-sales .filter-btn');
+            periodBtns.forEach(btn => btn.classList.remove('active'));
+            
+            const filtered = salesHistory.filter(s => s.clientName === clientName);
+            const body = document.getElementById('sales-table-body');
+            body.innerHTML = '';
+            
+            if (filtered.length === 0) {
+                body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 2rem;">No hay ventas para este cliente</td></tr>';
+            } else {
+                filtered.forEach(s => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>
+                            <div style="font-weight:600;">${s.date.toLocaleTimeString('es-BO', {hour:'2-digit', minute:'2-digit'})}</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">${s.date.toLocaleDateString('es-BO')}</div>
+                        </td>
+                        <td><div style="font-weight:600;">${s.clientName}</div></td>
+                        <td>${s.itemsCount || s.items} Artículos</td>
+                        <td style="font-weight:700; color:var(--primary);">${s.total.toFixed(2)} BS</td>
+                        <td><span style="background:#DCFCE7; color:#166534; padding:4px 10px; border-radius:20px; font-size:0.75rem; font-weight:600;">Completado</span></td>
+                        <td style="text-align: right;">
+                            <button class="qty-btn" onclick="viewSaleDetail(${s.id})" title="Ver Detalle"><i data-lucide="eye"></i></button>
+                        </td>
+                    `;
+                    body.appendChild(tr);
+                });
+            }
+            lucide.createIcons();
+        };
         
         window.openProductForm = function(id = null) {
             const title = document.getElementById('product-modal-title');
             const nameInput = document.getElementById('product-name');
+            const codeInput = document.getElementById('product-code');
             const categoryInput = document.getElementById('product-category');
+            const supplierInput = document.getElementById('product-supplier');
             const priceInput = document.getElementById('product-price');
             const stockInput = document.getElementById('product-stock');
             const idInput = document.getElementById('product-id');
@@ -2537,14 +2806,18 @@
                 title.innerText = 'Editar Producto';
                 idInput.value = p.id;
                 nameInput.value = p.name;
+                codeInput.value = p.code || '';
                 categoryInput.value = p.category;
+                supplierInput.value = p.supplier || 'N/A';
                 priceInput.value = p.price;
                 stockInput.value = p.stock;
             } else {
                 title.innerText = 'Nuevo Producto';
                 idInput.value = '';
                 nameInput.value = '';
+                codeInput.value = '';
                 categoryInput.value = 'Celulares';
+                supplierInput.value = 'N/A';
                 priceInput.value = '';
                 stockInput.value = '';
             }
@@ -2554,7 +2827,9 @@
         window.saveProduct = function() {
             const id = document.getElementById('product-id').value;
             const name = document.getElementById('product-name').value;
+            const code = document.getElementById('product-code').value;
             const category = document.getElementById('product-category').value;
+            const supplier = document.getElementById('product-supplier').value;
             const price = parseFloat(document.getElementById('product-price').value);
             const stock = parseInt(document.getElementById('product-stock').value);
 
@@ -2567,7 +2842,9 @@
                 // Update
                 const p = PRODUCTS.find(prod => prod.id == id);
                 p.name = name;
+                p.code = code;
                 p.category = category;
+                p.supplier = supplier;
                 p.price = price;
                 p.stock = stock;
                 showNotification("Producto actualizado");
@@ -2576,7 +2853,9 @@
                 const newProduct = {
                     id: PRODUCTS.length + 1,
                     name: name,
+                    code: code,
                     category: category,
+                    supplier: supplier,
                     price: price,
                     image: 'https://placehold.co/200x200?text=' + category,
                     stock: stock
@@ -2595,6 +2874,7 @@
             const idInput = document.getElementById('client-id');
             const nameInput = document.getElementById('client-name');
             const nitInput = document.getElementById('client-nit');
+            const phoneInput = document.getElementById('client-phone');
             const addressInput = document.getElementById('client-address');
             const sectorInput = document.getElementById('client-sector');
 
@@ -2604,6 +2884,7 @@
                 idInput.value = c.id;
                 nameInput.value = c.name;
                 nitInput.value = c.nit;
+                phoneInput.value = c.phone || '+591 ';
                 addressInput.value = c.address;
                 sectorInput.value = c.sector;
             } else {
@@ -2611,6 +2892,7 @@
                 idInput.value = '';
                 nameInput.value = '';
                 nitInput.value = '';
+                phoneInput.value = '+591 ';
                 addressInput.value = '';
                 sectorInput.value = '';
             }
@@ -2621,6 +2903,7 @@
             const id = document.getElementById('client-id').value;
             const name = document.getElementById('client-name').value;
             const nit = document.getElementById('client-nit').value;
+            const phone = document.getElementById('client-phone').value;
             const address = document.getElementById('client-address').value;
             const sector = document.getElementById('client-sector').value;
 
@@ -2633,6 +2916,7 @@
                 const c = CLIENTS.find(cli => cli.id == id);
                 c.name = name;
                 c.nit = nit;
+                c.phone = phone;
                 c.address = address;
                 c.sector = sector;
                 showNotification("Datos del cliente actualizados");
@@ -2641,6 +2925,7 @@
                     id: CLIENTS.length + 1,
                     name: name,
                     nit: nit,
+                    phone: phone,
                     address: address,
                     sector: sector
                 };
@@ -2659,22 +2944,40 @@
 
             document.getElementById('sale-detail-info').innerText = `Venta #${id.toString().slice(-5)} - ${s.date.toLocaleString()}`;
             
-            // Note: Since salesHistory in this dummy app doesn't store items list for simplicity, 
-            // I'll show a placeholder message or use the total. 
-            // In a real app, salesHistory would have an 'items' array.
             const itemsContainer = document.getElementById('sale-detail-items');
-            itemsContainer.innerHTML = `
-                <div style="padding: 1rem; text-align: center; color: var(--text-muted);">
-                    <p>Resumen de Items vendidos (${s.items} artículos)</p>
-                    <p style="font-size: 0.8rem;">Detalle de productos no almacenado en historial de demostración.</p>
-                </div>
-            `;
+            itemsContainer.innerHTML = '';
+            
+            if (s.items && Array.isArray(s.items)) {
+                s.items.forEach(item => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'detail-row';
+                    itemEl.style.padding = '8px 0';
+                    itemEl.style.borderBottom = '1px solid var(--border-color)';
+                    itemEl.innerHTML = `
+                        <div style="flex: 1;">
+                            <div style="font-weight:600;">${item.name}</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted);">${item.quantity} x ${item.price.toFixed(2)} BS</div>
+                        </div>
+                        <div style="font-weight:700;">${(item.quantity * item.price).toFixed(2)} BS</div>
+                    `;
+                    itemsContainer.appendChild(itemEl);
+                });
+            } else {
+                itemsContainer.innerHTML = `
+                    <div style="padding: 1rem; text-align: center; color: var(--text-muted);">
+                        <p>Resumen de Items vendidos (${s.itemsCount || s.items} artículos)</p>
+                        <p style="font-size: 0.8rem;">Detalle no disponible para ventas antiguas.</p>
+                    </div>
+                `;
+            }
 
             const summary = document.getElementById('sale-detail-summary');
             summary.innerHTML = `
                 <div class="detail-row"><span>Cliente</span><span>${s.clientName}</span></div>
                 <div class="detail-row"><span>Método</span><span>${s.method}</span></div>
-                <div class="detail-row"><span>Total Pagado</span><span>${s.total.toFixed(2)} BS</span></div>
+                <div class="detail-row" style="font-size:1.25rem; font-weight:800; color:var(--primary); border-top:2px dashed var(--border-color); padding-top:10px; margin-top:10px;">
+                    <span>Total Pagado</span><span>${s.total.toFixed(2)} BS</span>
+                </div>
             `;
 
             document.getElementById('reprint-btn').onclick = () => reprintTicket(id);
@@ -2685,14 +2988,26 @@
             const s = salesHistory.find(sale => sale.id === id);
             if (!s) return;
             
-            // Re-generate ticket data structure for the printer
-            const data = {
-                items: [{ name: "Artículos Variados", price: s.total / s.items, quantity: s.items }], // Mocking items
-                subtotal: s.total / 1.13,
-                discount: 0,
-                date: s.date,
-                clientName: s.clientName
-            };
+            let data;
+            if (s.items && Array.isArray(s.items)) {
+                const subtotal = s.items.reduce((a, b) => a + (b.price * b.quantity), 0);
+                data = {
+                    items: s.items,
+                    subtotal: subtotal,
+                    discount: (subtotal * 1.13) - s.total,
+                    date: s.date,
+                    clientName: s.clientName
+                };
+            } else {
+                // Fallback for old sales
+                data = {
+                    items: [{ name: "Artículos Variados", price: s.total / 1.13 / s.items, quantity: s.items }],
+                    subtotal: s.total / 1.13,
+                    discount: 0,
+                    date: s.date,
+                    clientName: s.clientName
+                };
+            }
             
             generateTicket(data);
             printTicket();
@@ -2702,17 +3017,45 @@
         window.openEditProductModal = function(id) { openProductForm(id); };
         window.openAddClientModal = function() { openClientForm(); };
         window.openEditClientModal = function(id) { openClientForm(id); };
-        window.openAddSupplierModal = function() {
-            document.getElementById('supplier-name').value = '';
-            document.getElementById('supplier-contact').value = '';
-            document.getElementById('supplier-category').value = '';
-            document.getElementById('supplier-email').value = '';
+        
+        window.openSupplierForm = function(id = null) {
+            const title = document.getElementById('supplier-modal-title');
+            const idInput = document.getElementById('supplier-id');
+            const nameInput = document.getElementById('supplier-name');
+            const contactInput = document.getElementById('supplier-contact');
+            const phoneInput = document.getElementById('supplier-phone');
+            const categoryInput = document.getElementById('supplier-category');
+            const emailInput = document.getElementById('supplier-email');
+
+            if (id) {
+                const s = SUPPLIERS.find(sup => sup.id === id);
+                title.innerText = 'Editar Proveedor';
+                idInput.value = s.id;
+                nameInput.value = s.name;
+                contactInput.value = s.contact;
+                phoneInput.value = s.phone || '+591 ';
+                categoryInput.value = s.category;
+                emailInput.value = s.email;
+            } else {
+                title.innerText = 'Nuevo Proveedor';
+                idInput.value = '';
+                nameInput.value = '';
+                contactInput.value = '';
+                phoneInput.value = '+591 ';
+                categoryInput.value = '';
+                emailInput.value = '';
+            }
             openModal('supplier-modal');
         };
 
+        window.openAddSupplierModal = function() { openSupplierForm(); };
+        window.openEditSupplierModal = function(id) { openSupplierForm(id); };
+
         window.saveSupplier = function() {
+            const id = document.getElementById('supplier-id').value;
             const name = document.getElementById('supplier-name').value;
             const contact = document.getElementById('supplier-contact').value;
+            const phone = document.getElementById('supplier-phone').value;
             const category = document.getElementById('supplier-category').value;
             const email = document.getElementById('supplier-email').value;
 
@@ -2721,16 +3064,27 @@
                 return;
             }
 
-            const newSupplier = {
-                id: SUPPLIERS.length + 1,
-                name: name,
-                contact: contact,
-                category: category,
-                email: email
-            };
+            if (id) {
+                const s = SUPPLIERS.find(sup => sup.id == id);
+                s.name = name;
+                s.contact = contact;
+                s.phone = phone;
+                s.category = category;
+                s.email = email;
+                showNotification("Datos del proveedor actualizados");
+            } else {
+                const newSupplier = {
+                    id: SUPPLIERS.length + 1,
+                    name: name,
+                    contact: contact,
+                    phone: phone,
+                    category: category,
+                    email: email
+                };
+                SUPPLIERS.push(newSupplier);
+                showNotification("Proveedor registrado con éxito");
+            }
             
-            SUPPLIERS.push(newSupplier);
-            showNotification("Proveedor registrado con éxito");
             closeModal('supplier-modal');
             renderSuppliersView();
         };
