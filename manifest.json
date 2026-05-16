@@ -1,0 +1,21 @@
+{
+  "name": "YARA POS - Aparatos Electrónicos",
+  "short_name": "YARA POS",
+  "description": "Sistema de Punto de Venta moderno para YARA.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F0F2F5",
+  "theme_color": "#007BFF",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

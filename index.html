@@ -6,6 +6,11 @@
     <title>POS YARA | Aparatos Electrónicos</title>
     <!-- Modern Typography -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#007BFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -546,22 +551,143 @@
             width: 100%;
         }
 
-        /* --- Responsive --- */
-        @media (max-width: 1024px) {
+        /* --- Responsive Refinements --- */
+        
+        /* Tablet & Mobile Layout */
+        @media (max-width: 1100px) {
+            :root {
+                --cart-width: 400px;
+            }
             main {
-                flex-direction: column;
-                overflow-y: auto;
-                height: auto;
+                padding: 1rem;
+                gap: 1rem;
             }
-            .cart-section {
-                width: 100%;
-                height: auto;
-                margin-bottom: 50px;
-            }
-            .inventory-section {
-                overflow-y: visible;
+            header {
+                padding: 0 1rem;
             }
         }
+
+        /* Mobile Specific (< 768px) */
+        @media (max-width: 768px) {
+            body {
+                overflow: auto;
+            }
+            header {
+                padding: 0 0.75rem;
+            }
+            .brand-info h1 {
+                font-size: 1.1rem;
+            }
+            .header-status {
+                gap: 12px;
+            }
+            .status-item {
+                display: none; /* Hide detailed status on mobile */
+            }
+            .btn-header span {
+                display: none; /* Hide button text on mobile */
+            }
+            .btn-header {
+                padding: 8px;
+            }
+            
+            main {
+                flex-direction: column;
+                margin-top: var(--header-height);
+                height: auto;
+                padding-bottom: 80px; /* Space for FAB or footer */
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+                gap: 0.75rem;
+            }
+
+            .product-card {
+                border-radius: 12px;
+            }
+
+            .product-img {
+                height: 140px;
+            }
+
+            .product-info {
+                padding: 0.75rem;
+            }
+
+            /* Mobile Cart as Overlay */
+            .cart-section {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 100%;
+                height: 100vh;
+                z-index: 1000;
+                border-radius: 0;
+                transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .cart-section.active {
+                right: 0;
+            }
+
+            .cart-header {
+                padding: 1rem;
+            }
+
+            .cart-items {
+                padding: 0.75rem;
+            }
+
+            .cart-summary {
+                padding: 1rem;
+                padding-bottom: 2rem;
+            }
+
+            /* Cart Toggle Button (Floating or in Header) */
+            #mobile-cart-toggle {
+                display: flex !important;
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background: var(--primary);
+                color: white;
+                box-shadow: 0 4px 20px rgba(0, 123, 255, 0.4);
+                align-items: center;
+                justify-content: center;
+                z-index: 900;
+                border: none;
+                cursor: pointer;
+            }
+
+            #cart-badge {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                background: var(--danger);
+                color: white;
+                font-size: 0.7rem;
+                font-weight: 800;
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 2px solid white;
+            }
+
+            #close-cart-mobile {
+                display: block !important;
+            }
+        }
+
+        /* Elements hidden by default */
+        #mobile-cart-toggle { display: none; }
+        #close-cart-mobile { display: none; }
 
         /* --- Animations --- */
         @keyframes fadeIn {
@@ -884,7 +1010,12 @@
         <!-- Cart Section -->
         <aside class="cart-section">
             <div class="cart-header">
-                <h2><i data-lucide="shopping-cart"></i> Carrito de Venta</h2>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button id="close-cart-mobile" class="qty-btn" onclick="toggleMobileCart()" style="border: none; background: #F1F5F9; display: none;">
+                        <i data-lucide="chevron-left"></i>
+                    </button>
+                    <h2><i data-lucide="shopping-cart"></i> Carrito</h2>
+                </div>
                 <span class="label" style="background: #E2E8F0; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem;" id="item-count">0 Items</span>
             </div>
 
@@ -922,6 +1053,12 @@
             </div>
         </aside>
     </main>
+
+    <!-- Mobile Cart Toggle -->
+    <button id="mobile-cart-toggle" onclick="toggleMobileCart()">
+        <i data-lucide="shopping-cart"></i>
+        <div id="cart-badge">0</div>
+    </button>
 
     <!-- Modals -->
     <div id="checkout-modal" class="modal-overlay">
@@ -1193,6 +1330,11 @@
             document.getElementById(modalId).classList.remove('active');
         };
 
+        window.toggleMobileCart = function() {
+            const cartPanel = document.querySelector('.cart-section');
+            cartPanel.classList.toggle('active');
+        };
+
         // --- CART LOGIC ---
 
         window.addToCart = function(productId) {
@@ -1287,6 +1429,10 @@
             summaryTax.innerText = `${tax.toFixed(2)} BS`;
             summaryDiscount.innerText = `-${discount.toFixed(2)} BS`;
             summaryTotal.innerText = `${total.toFixed(2)} BS`;
+
+            // Update mobile badge
+            const totalUnits = cart.reduce((a, b) => a + b.quantity, 0);
+            document.getElementById('cart-badge').innerText = totalUnits;
 
             lucide.createIcons();
         }
@@ -1589,6 +1735,15 @@
             renderProducts(PRODUCTS); // Actualizar vista de productos
             updateCartUI(); // Validar si algún item en el carrito superó el nuevo stock
         };
+
+        // --- SERVICE WORKER REGISTRATION ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registrado', reg))
+                    .catch(err => console.error('Error al registrar Service Worker', err));
+            });
+        }
 
         init();
     </script>
