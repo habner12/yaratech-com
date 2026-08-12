@@ -1,11 +1,14 @@
-const CACHE_NAME = 'trans-caranavi-v1';
+const CACHE_NAME = 'trans-caranavi-v2';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './styles.css',
     './script.js',
     './manifest.json',
-    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700;800&display=swap',
+    './ipsum.jpeg',
+    './minibus.jpeg',
+    './flota.jpeg',
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap',
     'https://unpkg.com/@phosphor-icons/web'
 ];
 
@@ -61,8 +64,6 @@ self.addEventListener('fetch', (event) => {
                     
                     caches.open(CACHE_NAME)
                         .then((cache) => {
-                            // Don't cache API calls or external images if we don't want to bloat storage
-                            // Only caching local assets and specific fonts
                             if (event.request.url.startsWith(self.location.origin)) {
                                 cache.put(event.request, responseToCache);
                             }
