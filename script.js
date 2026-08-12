@@ -1,36 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Service Worker Registration
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Service Worker registrado con éxito.', reg.scope))
+                .then(reg => console.log('Service Worker registrado.', reg.scope))
                 .catch(err => console.warn('Error al registrar Service Worker.', err));
         });
     }
 
-    // 2. PWA Install Prompt
     let deferredPrompt;
     const installBtn = document.getElementById('installAppBtn');
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        installBtn.classList.remove('hidden');
+    window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredPrompt = event;
+        if (installBtn) installBtn.classList.remove('hidden');
     });
 
-    installBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
             deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                console.log('Usuario aceptó instalar la PWA');
-            }
+            await deferredPrompt.userChoice;
             deferredPrompt = null;
             installBtn.classList.add('hidden');
-        }
-    });
+        });
+    }
 
-    // 3. Native Video Lightbox Modal (Los Tajibos style control)
     const videoModal = document.getElementById('videoModal');
     const modalVideo = document.getElementById('modalVideo');
     const btnVerVideo = document.getElementById('btnVerVideo');
@@ -39,301 +34,501 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnVerVideo && videoModal && modalVideo && closeModal) {
         btnVerVideo.addEventListener('click', () => {
             videoModal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Disable background scrolling
-            
-            // Play video with audio unmuted on click
+            document.body.style.overflow = 'hidden';
             modalVideo.currentTime = 0;
             modalVideo.muted = false;
-            
-            // Standard play promise pattern to avoid browser race condition errors
-            const playPromise = modalVideo.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    console.log("Video modal reproducido con éxito");
-                }).catch(error => {
-                    console.log("Auto-reproducción falló o requiere interacción del usuario:", error);
-                });
-            }
+            modalVideo.play().catch(error => console.log('Reproduccion pendiente de interaccion:', error));
         });
 
         const closeVideoModal = () => {
             modalVideo.pause();
             videoModal.classList.add('hidden');
-            document.body.style.overflow = ''; // Re-enable scrolling
+            document.body.style.overflow = '';
         };
 
         closeModal.addEventListener('click', closeVideoModal);
-
-        // Close when clicking outside content area
-        videoModal.addEventListener('click', (e) => {
-            if (e.target === videoModal) {
-                closeVideoModal();
-            }
+        videoModal.addEventListener('click', (event) => {
+            if (event.target === videoModal) closeVideoModal();
         });
-
-        // Close on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !videoModal.classList.contains('hidden')) {
-                closeVideoModal();
-            }
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !videoModal.classList.contains('hidden')) closeVideoModal();
         });
     }
 
-    // 4. Booking Engine Elements
+    const VEHICLES = {
+        ipsum: { label: 'Ipsum', price: 150, capacity: 6, hint: 'Puedes reservar hasta 6 pasajeros en Ipsum.', mapClass: 'ipsum-map' },
+        minibus: { label: 'Mini Bus', price: 110, capacity: 14, hint: 'Puedes reservar hasta 14 pasajeros en Mini Bus.', mapClass: 'minibus-map' },
+        flota: { label: 'Bus', price: 80, capacity: 44, hint: 'Puedes reservar hasta 44 pasajeros en Bus.', mapClass: 'bus-map' }
+    };
+
+    const STORAGE_KEY = 'transCaranaviReservationsV1';
+    const DAY_MS = 24 * 60 * 60 * 1000;
+    const businessWhatsApp = '59175223813';
+
+    const booking = {
+        step: 1,
+        vehicle: 'minibus',
+        passengers: 1,
+        selectedSeats: [],
+        payment: 'qr'
+    };
+
     const form = document.getElementById('bookingForm');
     const fechaInput = document.getElementById('fechaViaje');
     const fechaAviso = document.getElementById('fechaAviso');
     const tipoTransporte = document.getElementById('tipoTransporte');
     const pasajerosInput = document.getElementById('pasajeros');
+    const passengerForms = document.getElementById('passengerForms');
+    const passengerLimitHint = document.getElementById('passengerLimitHint');
+    const seatMap = document.getElementById('seatMap');
+    const seatMapTitle = document.getElementById('seatMapTitle');
+    const seatSelectionHint = document.getElementById('seatSelectionHint');
+    const orderSummary = document.getElementById('orderSummary');
     const precioTotalEl = document.getElementById('precioTotal');
-    const availabilityAlert = document.getElementById('availabilityAlert');
-    
-    // Stats elements
     const capacidadTotalEl = document.getElementById('capacidadTotal');
     const asientosOcupadosEl = document.getElementById('asientosOcupados');
     const asientosLibresEl = document.getElementById('asientosLibres');
     const progressBarFill = document.getElementById('progressBarFill');
     const cuposMaxAviso = document.getElementById('cuposMaxAviso');
-    const submitBtn = document.getElementById('submitBookingBtn');
-
-    // Set min date to today
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    if (fechaInput) {
-        fechaInput.min = `${yyyy}-${mm}-${dd}`;
-    }
-
-    // Deterministic state simulation per date and transport type
-    let simulatedCapacity = 14;
-    let simulatedBooked = 8;
-    let simulatedFree = 6;
-
-    function updateCapacityAndStats() {
-        if (!tipoTransporte || !pasajerosInput || !precioTotalEl) return;
-        
-        const selectedOption = tipoTransporte.options[tipoTransporte.selectedIndex];
-        const capacity = parseInt(selectedOption.dataset.capacity) || 14;
-        const pricePerPerson = parseInt(selectedOption.dataset.price) || 110;
-        
-        // Update input passengers limits
-        pasajerosInput.max = capacity;
-        if (parseInt(pasajerosInput.value) > capacity) {
-            pasajerosInput.value = capacity;
-        }
-
-        const dateStr = (fechaInput && fechaInput.value) ? fechaInput.value : `${yyyy}-${mm}-${dd}`;
-        
-        // Generate a pseudo-random hash based on the combination of date and transport type
-        let combinedStr = dateStr + selectedOption.value;
-        let hash = 0;
-        for (let i = 0; i < combinedStr.length; i++) {
-            hash = combinedStr.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        
-        simulatedCapacity = capacity;
-        
-        // Simulate already booked seats (always leave at least 2 empty seats, but at most capacity-1)
-        const maxSimulatedBooked = Math.max(1, capacity - 2);
-        simulatedBooked = Math.abs(hash % maxSimulatedBooked) + 1;
-        simulatedFree = simulatedCapacity - simulatedBooked;
-
-        // Apply input passenger count checking
-        const requestedPasajeros = parseInt(pasajerosInput.value) || 1;
-        const finalFree = simulatedFree - requestedPasajeros;
-
-        // Update Text
-        if (capacidadTotalEl) capacidadTotalEl.textContent = `${simulatedCapacity} asientos`;
-        if (asientosOcupadosEl) asientosOcupadosEl.textContent = simulatedBooked;
-        
-        if (finalFree >= 0) {
-            if (asientosLibresEl) {
-                asientosLibresEl.textContent = finalFree;
-                asientosLibresEl.parentElement.className = 'stat-item highlight-green';
-            }
-            if (cuposMaxAviso) {
-                cuposMaxAviso.textContent = `Quedarán ${finalFree} asientos libres tras tu reserva.`;
-                cuposMaxAviso.style.color = '#4B5563';
-            }
-            if (submitBtn) {
-                submitBtn.removeAttribute('disabled');
-                submitBtn.style.opacity = '1';
-            }
-        } else {
-            if (asientosLibresEl) {
-                asientosLibresEl.textContent = 0;
-                asientosLibresEl.parentElement.className = 'stat-item text-error';
-            }
-            if (cuposMaxAviso) {
-                cuposMaxAviso.textContent = `¡Exceso de pasajeros! Solo quedan ${simulatedFree} asientos disponibles para esta fecha.`;
-                cuposMaxAviso.style.color = '#ef4444';
-            }
-            if (submitBtn) {
-                submitBtn.setAttribute('disabled', 'true');
-                submitBtn.style.opacity = '0.5';
-            }
-        }
-
-        // Fill Progress Bar
-        if (progressBarFill) {
-            const percentage = Math.min(100, ((simulatedBooked + requestedPasajeros) / simulatedCapacity) * 100);
-            progressBarFill.style.width = `${percentage}%`;
-            if (percentage >= 90) {
-                progressBarFill.style.backgroundColor = '#ef4444'; // Red if almost full
-            } else {
-                progressBarFill.style.backgroundColor = 'var(--clr-secondary)';
-            }
-        }
-
-        // Price Update
-        const total = pricePerPerson * requestedPasajeros;
-        precioTotalEl.textContent = `${total} Bs.`;
-
-        // Availability box text
-        if (availabilityAlert) {
-            if (fechaInput && fechaInput.value) {
-                if (finalFree >= 0) {
-                    availabilityAlert.innerHTML = `<i class="ph-fill ph-check-circle" style="color:var(--clr-whatsapp)"></i> ¡Disponible! Puedes reservar tus ${requestedPasajeros} asientos para la fecha seleccionada.`;
-                    availabilityAlert.style.borderLeftColor = 'var(--clr-whatsapp)';
-                } else {
-                    availabilityAlert.innerHTML = `<i class="ph-fill ph-warning-octagon" style="color:#ef4444"></i> Cupos insuficientes en el tipo de vehículo seleccionado.`;
-                    availabilityAlert.style.borderLeftColor = '#ef4444';
-                }
-            } else {
-                availabilityAlert.innerHTML = `<i class="ph-fill ph-info"></i> Selecciona una fecha para ver el estado de ocupación del transporte.`;
-                availabilityAlert.style.borderLeftColor = 'var(--clr-secondary)';
-            }
-        }
-    }
-
-    // Date Validation
-    if (fechaInput) {
-        fechaInput.addEventListener('change', (e) => {
-            const selectedDate = new Date(e.target.value + 'T12:00:00');
-            const day = selectedDate.getDay(); // 0 = Sunday, 5 = Friday, 6 = Saturday
-            
-            if (fechaAviso) {
-                if (day !== 0 && day !== 5 && day !== 6) {
-                    fechaAviso.classList.remove('hidden');
-                    fechaAviso.textContent = 'Salidas regulares son Viernes, Sábado y Domingo. Otras fechas bajo consulta.';
-                    fechaAviso.style.color = 'var(--clr-secondary)';
-                } else {
-                    fechaAviso.classList.add('hidden');
-                }
-            }
-            updateCapacityAndStats();
-        });
-    }
-
-    if (tipoTransporte) tipoTransporte.addEventListener('change', updateCapacityAndStats);
-    if (pasajerosInput) pasajerosInput.addEventListener('input', updateCapacityAndStats);
-
-    // Initial load
-    updateCapacityAndStats();
-
-    // 5. Payment Method Logic
-    const optionCards = document.querySelectorAll('.payment-option-card');
+    const availabilityAlert = document.getElementById('availabilityAlert');
+    const nextStepBtn = document.getElementById('nextStepBtn');
+    const prevStepBtn = document.getElementById('prevStepBtn');
+    const clearBookingBtn = document.getElementById('clearBookingBtn');
+    const increasePassengers = document.getElementById('increasePassengers');
+    const decreasePassengers = document.getElementById('decreasePassengers');
     const payBoxes = {
         qr: document.getElementById('payBoxQR'),
         tarjeta: document.getElementById('payBoxCard'),
         whatsapp: document.getElementById('payBoxWA')
     };
 
-    let selectedPaymentMethod = 'qr';
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    if (fechaInput) {
+        fechaInput.min = `${yyyy}-${mm}-${dd}`;
+        fechaInput.value = `${yyyy}-${mm}-${dd}`;
+    }
 
-    optionCards.forEach(card => {
-        card.addEventListener('click', () => {
-            // Remove active classes
-            optionCards.forEach(c => c.classList.remove('active'));
-            card.classList.add('active');
-            
-            const radioBtn = card.querySelector('input[type="radio"]');
-            if (radioBtn) radioBtn.checked = true;
+    function getReservations() {
+        const now = Date.now();
+        let reservations = [];
+        try {
+            reservations = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        } catch {
+            reservations = [];
+        }
+        const activeReservations = reservations.filter(item => item.expiresAt > now);
+        if (activeReservations.length !== reservations.length) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(activeReservations));
+        }
+        return activeReservations;
+    }
 
-            const method = card.dataset.method;
-            selectedPaymentMethod = method;
+    function saveReservation(record) {
+        const reservations = getReservations();
+        reservations.push({
+            ...record,
+            createdAt: Date.now(),
+            expiresAt: Date.now() + DAY_MS
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(reservations));
+    }
 
-            // Show/Hide details boxes
-            Object.keys(payBoxes).forEach(key => {
-                if (payBoxes[key]) {
-                    if (key === method) {
-                        payBoxes[key].classList.remove('hidden');
-                    } else {
-                        payBoxes[key].classList.add('hidden');
-                    }
+    function getDateKey() {
+        return fechaInput && fechaInput.value ? fechaInput.value : `${yyyy}-${mm}-${dd}`;
+    }
+
+    function getBookedSeats() {
+        const date = getDateKey();
+        return getReservations()
+            .filter(item => item.date === date && item.vehicle === booking.vehicle)
+            .flatMap(item => item.seats);
+    }
+
+    function collectPassengerData() {
+        return Array.from({ length: booking.passengers }, (_, index) => ({
+            name: document.getElementById(`passengerName-${index}`)?.value.trim() || '',
+            phone: document.getElementById(`passengerPhone-${index}`)?.value.trim() || '',
+            document: document.getElementById(`passengerDocument-${index}`)?.value.trim() || ''
+        }));
+    }
+
+    function getCapacity() {
+        return VEHICLES[booking.vehicle].capacity;
+    }
+
+    function getAvailableSeats() {
+        return getCapacity() - getBookedSeats().length;
+    }
+
+    function renderSteps() {
+        document.querySelectorAll('.booking-step').forEach(step => {
+            step.classList.toggle('active', Number(step.dataset.step) === booking.step);
+        });
+        document.querySelectorAll('[data-step-indicator]').forEach(item => {
+            const step = Number(item.dataset.stepIndicator);
+            item.classList.toggle('active', step === booking.step);
+            item.classList.toggle('complete', step < booking.step);
+        });
+
+        if (prevStepBtn) prevStepBtn.disabled = booking.step === 1;
+        if (nextStepBtn) {
+            nextStepBtn.classList.toggle('hidden', booking.step === 4);
+            nextStepBtn.innerHTML = booking.step === 3
+                ? 'Ver Pago <i class="ph ph-arrow-right"></i>'
+                : 'Continuar <i class="ph ph-arrow-right"></i>';
+        }
+        renderOrderSummary();
+    }
+
+    function renderPassengerForms() {
+        if (!passengerForms) return;
+        const existing = collectPassengerData();
+        passengerForms.innerHTML = Array.from({ length: booking.passengers }, (_, index) => {
+            const passenger = existing[index] || {};
+            const leadLabel = index === 0 ? 'Titular' : `Pasajero ${index + 1}`;
+            return `
+                <article class="passenger-card">
+                    <h4><i class="ph ph-user-circle"></i> ${leadLabel}</h4>
+                    <div class="form-group">
+                        <label for="passengerName-${index}">Nombre completo</label>
+                        <input type="text" id="passengerName-${index}" value="${escapeAttr(passenger.name)}" placeholder="Ej. Juan Perez" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="passengerPhone-${index}">WhatsApp / Celular</label>
+                            <input type="tel" id="passengerPhone-${index}" value="${escapeAttr(passenger.phone)}" placeholder="Ej. 75223813" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="passengerDocument-${index}">C.I. / Pasaporte</label>
+                            <input type="text" id="passengerDocument-${index}" value="${escapeAttr(passenger.document)}" placeholder="Ej. 9832483 LP" required>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }).join('');
+    }
+
+    function renderSeatMap() {
+        if (!seatMap || !seatMapTitle) return;
+        const vehicle = VEHICLES[booking.vehicle];
+        const bookedSeats = new Set(getBookedSeats());
+        seatMap.className = `seat-map ${vehicle.mapClass}`;
+        seatMapTitle.textContent = `${vehicle.label} - ${vehicle.capacity === 44 ? '40+ asientos' : `${vehicle.capacity} asientos`}`;
+        seatMap.innerHTML = '';
+
+        for (let seat = 1; seat <= vehicle.capacity; seat++) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'seat-button';
+            button.textContent = seat;
+            button.dataset.seat = String(seat);
+            button.setAttribute('aria-label', `Asiento ${seat}`);
+
+            if (bookedSeats.has(seat)) {
+                button.classList.add('booked');
+                button.disabled = true;
+            } else if (booking.selectedSeats.includes(seat)) {
+                button.classList.add('selected');
+            }
+
+            button.addEventListener('click', () => toggleSeat(seat));
+            seatMap.appendChild(button);
+        }
+        renderSeatHint();
+    }
+
+    function renderSeatHint() {
+        if (!seatSelectionHint) return;
+        const needed = booking.passengers - booking.selectedSeats.length;
+        if (needed > 0) {
+            seatSelectionHint.textContent = `Selecciona ${needed} asiento${needed === 1 ? '' : 's'} mas para completar la reserva.`;
+            seatSelectionHint.className = 'seat-selection-hint';
+        } else {
+            seatSelectionHint.textContent = `Asientos seleccionados: ${booking.selectedSeats.sort((a, b) => a - b).join(', ')}`;
+            seatSelectionHint.className = 'seat-selection-hint success';
+        }
+    }
+
+    function renderStats() {
+        const vehicle = VEHICLES[booking.vehicle];
+        const booked = getBookedSeats().length;
+        const selected = booking.selectedSeats.length;
+        const free = Math.max(0, vehicle.capacity - booked - selected);
+        const capacityLabel = vehicle.capacity === 44 ? '40+ asientos' : `${vehicle.capacity} asientos`;
+        const percentage = Math.min(100, ((booked + selected) / vehicle.capacity) * 100);
+
+        if (capacidadTotalEl) capacidadTotalEl.textContent = capacityLabel;
+        if (asientosOcupadosEl) asientosOcupadosEl.textContent = booked;
+        if (asientosLibresEl) asientosLibresEl.textContent = free;
+        if (progressBarFill) {
+            progressBarFill.style.width = `${percentage}%`;
+            progressBarFill.style.backgroundColor = percentage >= 90 ? '#ef4444' : 'var(--clr-secondary)';
+        }
+        if (cuposMaxAviso) {
+            cuposMaxAviso.textContent = `${free} asientos quedaran disponibles despues de esta seleccion.`;
+        }
+        if (availabilityAlert) {
+            availabilityAlert.innerHTML = `<i class="ph-fill ph-check-circle"></i> ${booked} asiento${booked === 1 ? '' : 's'} reservado${booked === 1 ? '' : 's'} en las ultimas 24 horas para ${vehicle.label}.`;
+        }
+        if (precioTotalEl) precioTotalEl.textContent = `${vehicle.price * booking.passengers} Bs.`;
+    }
+
+    function renderOrderSummary() {
+        if (!orderSummary) return;
+        const vehicle = VEHICLES[booking.vehicle];
+        const passengers = collectPassengerData();
+        const list = passengers.map((passenger, index) => {
+            const seat = booking.selectedSeats[index] || '-';
+            const name = passenger.name || `Pasajero ${index + 1}`;
+            const documentId = passenger.document || 'Documento pendiente';
+            return `<li><strong>Asiento ${seat}:</strong> ${escapeHtml(name)} <span>${escapeHtml(documentId)}</span></li>`;
+        }).join('');
+
+        orderSummary.innerHTML = `
+            <div>
+                <span>Fecha</span>
+                <strong>${getDateKey()}</strong>
+            </div>
+            <div>
+                <span>Transporte</span>
+                <strong>${vehicle.label}</strong>
+            </div>
+            <div>
+                <span>Pasajeros</span>
+                <strong>${booking.passengers}</strong>
+            </div>
+            <div>
+                <span>Asientos</span>
+                <strong>${booking.selectedSeats.length ? booking.selectedSeats.join(', ') : 'Pendiente'}</strong>
+            </div>
+            <ul>${list}</ul>
+        `;
+    }
+
+    function updateVehicle(vehicleKey) {
+        booking.vehicle = vehicleKey;
+        const vehicle = VEHICLES[vehicleKey];
+        if (tipoTransporte) {
+            tipoTransporte.value = vehicleKey;
+            tipoTransporte.dataset.price = String(vehicle.price);
+            tipoTransporte.dataset.capacity = String(vehicle.capacity);
+        }
+        document.querySelectorAll('.vehicle-choice').forEach(choice => {
+            choice.classList.toggle('active', choice.dataset.vehicle === vehicleKey);
+        });
+        if (passengerLimitHint) passengerLimitHint.textContent = vehicle.hint;
+        if (pasajerosInput) pasajerosInput.max = vehicle.capacity;
+        setPassengerCount(Math.min(booking.passengers, vehicle.capacity), false);
+        booking.selectedSeats = booking.selectedSeats.filter(seat => seat <= vehicle.capacity);
+        renderAll();
+    }
+
+    function setPassengerCount(count, shouldRender = true) {
+        const max = Math.min(getCapacity(), Math.max(1, getAvailableSeats() + booking.selectedSeats.length));
+        booking.passengers = Math.max(1, Math.min(Number(count) || 1, max));
+        if (pasajerosInput) pasajerosInput.value = booking.passengers;
+        if (booking.selectedSeats.length > booking.passengers) {
+            booking.selectedSeats = booking.selectedSeats.slice(0, booking.passengers);
+        }
+        if (shouldRender) renderAll();
+    }
+
+    function toggleSeat(seat) {
+        if (booking.selectedSeats.includes(seat)) {
+            booking.selectedSeats = booking.selectedSeats.filter(item => item !== seat);
+        } else {
+            if (booking.selectedSeats.length >= booking.passengers) return;
+            booking.selectedSeats.push(seat);
+        }
+        booking.selectedSeats.sort((a, b) => a - b);
+        renderSeatMap();
+        renderStats();
+        renderOrderSummary();
+    }
+
+    function validateStep(step) {
+        if (step === 1) {
+            if (!fechaInput.value) {
+                fechaInput.focus();
+                return false;
+            }
+            if (booking.passengers > getAvailableSeats()) {
+                showNotice(`Solo quedan ${getAvailableSeats()} asientos disponibles para este vehiculo.`);
+                return false;
+            }
+        }
+
+        if (step === 2) {
+            const inputs = passengerForms.querySelectorAll('input');
+            for (const input of inputs) {
+                if (!input.value.trim()) {
+                    input.focus();
+                    return false;
                 }
+            }
+        }
+
+        if (step === 3 && booking.selectedSeats.length !== booking.passengers) {
+            showNotice(`Debes seleccionar ${booking.passengers} asiento${booking.passengers === 1 ? '' : 's'}.`);
+            return false;
+        }
+
+        return true;
+    }
+
+    function showNotice(message) {
+        if (!availabilityAlert) return;
+        availabilityAlert.innerHTML = `<i class="ph-fill ph-warning-octagon"></i> ${message}`;
+    }
+
+    function renderAll() {
+        renderPassengerForms();
+        renderSeatMap();
+        renderStats();
+        renderSteps();
+    }
+
+    function escapeHtml(value) {
+        return String(value || '').replace(/[&<>"']/g, char => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[char]));
+    }
+
+    function escapeAttr(value) {
+        return escapeHtml(value).replace(/`/g, '&#96;');
+    }
+
+    document.querySelectorAll('.vehicle-choice').forEach(choice => {
+        choice.addEventListener('click', () => updateVehicle(choice.dataset.vehicle));
+    });
+
+    if (increasePassengers) {
+        increasePassengers.addEventListener('click', () => setPassengerCount(booking.passengers + 1));
+    }
+    if (decreasePassengers) {
+        decreasePassengers.addEventListener('click', () => setPassengerCount(booking.passengers - 1));
+    }
+    if (pasajerosInput) {
+        pasajerosInput.addEventListener('input', () => setPassengerCount(pasajerosInput.value));
+    }
+    if (fechaInput) {
+        fechaInput.addEventListener('change', () => {
+            const selectedDate = new Date(`${fechaInput.value}T12:00:00`);
+            const day = selectedDate.getDay();
+            if (fechaAviso) {
+                fechaAviso.classList.toggle('hidden', day === 0 || day === 5 || day === 6);
+                fechaAviso.textContent = 'Salidas regulares son viernes, sabado y domingo. Otras fechas bajo consulta.';
+            }
+            booking.selectedSeats = [];
+            setPassengerCount(booking.passengers, false);
+            renderAll();
+        });
+    }
+
+    document.querySelectorAll('.payment-option-card').forEach(card => {
+        card.addEventListener('click', () => {
+            booking.payment = card.dataset.method;
+            document.querySelectorAll('.payment-option-card').forEach(item => item.classList.remove('active'));
+            card.classList.add('active');
+            const radio = card.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
+            Object.keys(payBoxes).forEach(key => {
+                if (payBoxes[key]) payBoxes[key].classList.toggle('hidden', key !== booking.payment);
             });
         });
     });
 
-    // 6. Submit Reservation to WhatsApp
-    if (form) {
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const fecha = fechaInput.value;
-            const transporteOption = tipoTransporte.options[tipoTransporte.selectedIndex].text;
-            const pasajeros = pasajerosInput.value;
-            const nombre = document.getElementById('nombreCompleto').value;
-            const telefono = document.getElementById('telefono').value;
-            const carnet = document.getElementById('carnet').value;
-            const total = precioTotalEl.textContent;
+    if (nextStepBtn) {
+        nextStepBtn.addEventListener('click', () => {
+            if (!validateStep(booking.step)) return;
+            booking.step = Math.min(4, booking.step + 1);
+            renderSteps();
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }
+    if (prevStepBtn) {
+        prevStepBtn.addEventListener('click', () => {
+            booking.step = Math.max(1, booking.step - 1);
+            renderSteps();
+        });
+    }
+    if (clearBookingBtn) {
+        clearBookingBtn.addEventListener('click', () => {
+            booking.step = 1;
+            booking.passengers = 1;
+            booking.selectedSeats = [];
+            updateVehicle('minibus');
+        });
+    }
 
-            let pagoTexto = 'Efectivo / Coordinar por WhatsApp';
-            if (selectedPaymentMethod === 'qr') {
-                pagoTexto = 'Pago por transferencia QR (adjuntaré comprobante)';
-            } else if (selectedPaymentMethod === 'tarjeta') {
-                const cardNum = document.getElementById('cardNumber').value || '•••• •••• •••• ••••';
-                pagoTexto = `Pago con Tarjeta de Crédito/Débito (${cardNum.slice(-4)})`;
+    if (form) {
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            if (!validateStep(1) || !validateStep(2) || !validateStep(3)) return;
+
+            const vehicle = VEHICLES[booking.vehicle];
+            const passengers = collectPassengerData();
+            const total = `${vehicle.price * booking.passengers} Bs.`;
+            let paymentText = 'Efectivo / coordinar por WhatsApp';
+
+            if (booking.payment === 'qr') {
+                paymentText = 'Pago por QR (se adjuntara comprobante)';
+            } else if (booking.payment === 'tarjeta') {
+                const cardNumber = document.getElementById('cardNumber')?.value || '';
+                paymentText = `Pago con tarjeta terminacion ${cardNumber.slice(-4) || 'pendiente'}`;
             }
 
-            const itinerarioResumen = `📍 Partida: 06:30 AM - Sede UMSA Caranavi
-🕒 Llegada: 09:30 AM - San Benito
-🎒 Retorno: 17:00 PM - Retorno a Caranavi`;
+            saveReservation({
+                date: getDateKey(),
+                vehicle: booking.vehicle,
+                seats: [...booking.selectedSeats],
+                passengers,
+                total,
+                payment: booking.payment
+            });
 
-            const mensaje = `🌿 *TRANSPORTE TURÍSTICO CARANAVI* 🌿
-¡Hola! Quiero confirmar una reserva de traslado turístico:
+            const passengerLines = passengers.map((passenger, index) => (
+                `${index + 1}. Asiento ${booking.selectedSeats[index]} - ${passenger.name} - Doc: ${passenger.document} - Tel: ${passenger.phone}`
+            )).join('\n');
 
-👤 *Titular:* ${nombre}
-🪪 *Documento C.I.:* ${carnet}
-📞 *Teléfono:* ${telefono}
-📅 *Fecha de Viaje:* ${fecha}
-🚐 *Transporte:* ${transporteOption}
-👥 *Asientos reservados:* ${pasajeros}
-💰 *Total a pagar:* ${total}
-💳 *Método de Pago:* ${pagoTexto}
+            const message = `TRANSPORTE TURISTICO CARANAVI
+Hola, quiero confirmar una reserva de excursion:
 
-------------------------------------
-📌 *ITINERARIO DEL VIAJE*
-${itinerarioResumen}
-------------------------------------
+Fecha de viaje: ${getDateKey()}
+Transporte: ${vehicle.label}
+Pasajeros: ${booking.passengers}
+Asientos reservados: ${booking.selectedSeats.join(', ')}
+Total a pagar: ${total}
+Metodo de pago: ${paymentText}
 
-Por favor, confirmen mi reservación. ¡Gracias!`;
+DATOS DE PASAJEROS
+${passengerLines}
 
-            const encodedMensaje = encodeURIComponent(mensaje);
-            const numeroEmpresa = '59175223813'; // Target business number
-            const whatsappUrl = `https://api.whatsapp.com/send?phone=${numeroEmpresa}&text=${encodedMensaje}`;
-            
+ITINERARIO
+Partida: 06:30 AM - Sede UMSA Caranavi
+Llegada: 09:30 AM - San Benito
+Retorno: 17:00 PM - Retorno a Caranavi
+
+Por favor, confirmen mi reservacion. Gracias.`;
+
+            renderAll();
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=${businessWhatsApp}&text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
         });
     }
-});
 
-// Selector function from cards
-window.selectTransport = function(type) {
-    const selector = document.getElementById('tipoTransporte');
-    if (selector) {
-        selector.value = type;
-        
-        // Trigger change event to update details
-        const event = new Event('change');
-        selector.dispatchEvent(event);
-    }
-    
-    // Smooth scroll to booking
-    const target = document.getElementById('reserva');
-    if (target) {
-        target.scrollIntoView({ behavior: 'smooth' });
-    }
-};
+    window.selectTransport = function(type) {
+        if (VEHICLES[type]) updateVehicle(type);
+        const target = document.getElementById('reserva');
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    renderAll();
+});

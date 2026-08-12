@@ -593,6 +593,11 @@ a {
     grid-template-columns: 1fr 1.2fr;
     gap: 4rem;
     align-items: flex-start;
+    min-width: 0;
+}
+
+.booking-container > * {
+    min-width: 0;
 }
 
 .booking-info h2 {
@@ -707,6 +712,19 @@ a {
     font-size: 1.5rem;
 }
 
+.booking-kicker {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
 /* Booking Card & Form */
 .booking-card {
     background: var(--clr-white);
@@ -714,11 +732,410 @@ a {
     box-shadow: var(--shadow-lg);
     color: var(--clr-dark);
     padding: 3rem;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .booking-form {
     display: flex;
     flex-direction: column;
+    min-width: 0;
+}
+
+.booking-stepper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.step-pill {
+    border: 1px solid #E5E7EB;
+    background: #F9FAFB;
+    color: #4B5563;
+    border-radius: var(--border-radius-sm);
+    min-height: 54px;
+    padding: 0.65rem 0.5rem;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+.step-pill span {
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    background: #E5E7EB;
+    border-radius: 50%;
+    margin-right: 0.25rem;
+}
+
+.step-pill.active,
+.step-pill.complete {
+    border-color: var(--clr-primary);
+    background: rgba(5, 150, 105, 0.08);
+    color: var(--clr-primary-dark);
+}
+
+.step-pill.active span,
+.step-pill.complete span {
+    background: var(--clr-primary);
+    color: var(--clr-white);
+}
+
+.booking-step {
+    display: none;
+}
+
+.booking-step.active {
+    display: block;
+    animation: fadeIn 0.25s ease;
+}
+
+.step-heading {
+    margin-bottom: 1.5rem;
+}
+
+.step-heading span {
+    display: block;
+    color: var(--clr-secondary);
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.step-heading h3 {
+    font-size: 1.45rem;
+    color: var(--clr-dark);
+}
+
+.vehicle-choice-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.85rem;
+    margin-bottom: 1.5rem;
+}
+
+.vehicle-choice {
+    display: flex;
+    min-height: 136px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.4rem;
+    padding: 1rem;
+    border: 2px solid #E5E7EB;
+    border-radius: var(--border-radius-sm);
+    background: #F9FAFB;
+    text-align: left;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.vehicle-choice i {
+    color: var(--clr-primary);
+    font-size: 1.9rem;
+}
+
+.vehicle-choice strong {
+    font-size: 1.05rem;
+    color: var(--clr-dark);
+}
+
+.vehicle-choice span {
+    color: #6B7280;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.vehicle-choice.active {
+    border-color: var(--clr-primary);
+    background: rgba(5, 150, 105, 0.08);
+    box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.08);
+}
+
+.passenger-counter {
+    margin-bottom: 1.25rem;
+}
+
+.counter-control {
+    display: grid;
+    grid-template-columns: 48px 1fr 48px;
+    border: 1px solid #D1D5DB;
+    border-radius: var(--border-radius-sm);
+    overflow: hidden;
+    background: #F9FAFB;
+}
+
+.counter-control button {
+    border: none;
+    background: var(--clr-primary);
+    color: var(--clr-white);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.counter-control input {
+    border: none;
+    border-radius: 0;
+    text-align: center;
+    font-size: 1.35rem;
+    font-weight: 800;
+    background: var(--clr-white);
+}
+
+.passenger-counter small,
+.seat-selection-hint {
+    display: block;
+    color: #6B7280;
+    font-size: 0.86rem;
+    margin-top: 0.65rem;
+}
+
+.public-note {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 1rem;
+    border-radius: var(--border-radius-sm);
+    background: #ECFDF5;
+    border: 1px solid #A7F3D0;
+    color: #065F46;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.public-note i {
+    font-size: 1.25rem;
+}
+
+.passenger-forms {
+    display: grid;
+    gap: 1rem;
+    max-height: 620px;
+    overflow-y: auto;
+    padding-right: 0.35rem;
+}
+
+.passenger-card {
+    border: 1px solid #E5E7EB;
+    border-radius: var(--border-radius-sm);
+    padding: 1rem;
+    background: #F9FAFB;
+}
+
+.passenger-card h4 {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    color: var(--clr-primary-dark);
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.seat-map-wrap {
+    border: 1px solid #D1D5DB;
+    border-radius: var(--border-radius-md);
+    padding: 1rem;
+    background: linear-gradient(180deg, #ffffff 0%, #F3F4F6 100%);
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.seat-map-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid #D1D5DB;
+    padding-bottom: 0.85rem;
+    margin-bottom: 1rem;
+    color: var(--clr-primary-dark);
+}
+
+.seat-map-header i {
+    font-size: 1.65rem;
+}
+
+.seat-map {
+    display: grid;
+    justify-content: center;
+    gap: 0.55rem;
+    margin: 0 auto;
+    width: max-content;
+    max-width: 100%;
+}
+
+.ipsum-map {
+    grid-template-columns: repeat(2, 48px);
+}
+
+.minibus-map {
+    grid-template-columns: 48px 48px 24px 48px 48px;
+}
+
+.bus-map {
+    grid-template-columns: 42px 42px 22px 42px 42px;
+    gap: 0.45rem;
+}
+
+.minibus-map .seat-button:nth-child(4n + 3),
+.bus-map .seat-button:nth-child(4n + 3) {
+    grid-column: 4;
+}
+
+.seat-button {
+    position: relative;
+    width: 48px;
+    height: 44px;
+    border: 2px solid #9CA3AF;
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: #111827;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: inset 5px 0 0 #E5E7EB, inset -5px 0 0 #E5E7EB, 0 2px 0 #D1D5DB;
+    transition: all var(--transition-fast);
+}
+
+.bus-map .seat-button {
+    width: 42px;
+    height: 38px;
+    font-size: 0.82rem;
+}
+
+.seat-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: var(--clr-primary);
+}
+
+.seat-button.selected {
+    background: var(--clr-primary);
+    border-color: var(--clr-primary-dark);
+    color: var(--clr-white);
+    box-shadow: inset 5px 0 0 rgba(255,255,255,0.18), inset -5px 0 0 rgba(255,255,255,0.18), 0 2px 0 var(--clr-primary-dark);
+}
+
+.seat-button.booked {
+    background: #EF4444;
+    border-color: #B91C1C;
+    color: var(--clr-white);
+    cursor: not-allowed;
+    opacity: 0.82;
+    box-shadow: inset 5px 0 0 rgba(255,255,255,0.16), inset -5px 0 0 rgba(255,255,255,0.16);
+}
+
+.seat-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+    color: #4B5563;
+    font-weight: 700;
+    font-size: 0.82rem;
+}
+
+.seat-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.legend-box {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 2px solid #9CA3AF;
+    background: #FFFFFF;
+}
+
+.legend-box.selected {
+    background: var(--clr-primary);
+    border-color: var(--clr-primary-dark);
+}
+
+.legend-box.booked {
+    background: #EF4444;
+    border-color: #B91C1C;
+}
+
+.seat-selection-hint.success {
+    color: var(--clr-primary-dark);
+    font-weight: 800;
+}
+
+.order-summary {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: var(--border-radius-sm);
+    padding: 1rem;
+}
+
+.order-summary div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.order-summary span {
+    color: #6B7280;
+    font-size: 0.76rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.order-summary strong {
+    color: var(--clr-dark);
+}
+
+.order-summary ul {
+    grid-column: 1 / -1;
+    list-style: none;
+    border-top: 1px solid #E5E7EB;
+    padding-top: 0.75rem;
+}
+
+.order-summary li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.45rem 0;
+    color: #374151;
+    font-size: 0.88rem;
+}
+
+.order-summary li span {
+    text-transform: none;
+    font-size: 0.82rem;
+}
+
+.booking-actions {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 0.75rem;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+.booking-actions .btn:last-child {
+    justify-self: end;
+}
+
+.booking-actions .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .form-group {
@@ -1096,6 +1513,7 @@ input:focus, select:focus {
     }
     .booking-info {
         text-align: center;
+        width: 100%;
         max-width: 650px;
         margin: 0 auto;
     }
@@ -1151,6 +1569,19 @@ input:focus, select:focus {
     
     .booking-card {
         padding: 1.75rem;
+        width: 100%;
+    }
+
+    .booking-stepper {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .vehicle-choice-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .vehicle-choice {
+        min-height: 96px;
     }
     
     .form-row {
@@ -1166,5 +1597,43 @@ input:focus, select:focus {
     .qr-container {
         flex-direction: column;
         text-align: center;
+    }
+
+    .seat-map-wrap {
+        padding: 0.85rem 0.55rem;
+    }
+
+    .seat-map {
+        justify-content: start;
+    }
+
+    .bus-map {
+        grid-template-columns: 36px 36px 16px 36px 36px;
+        gap: 0.34rem;
+    }
+
+    .bus-map .seat-button {
+        width: 36px;
+        height: 34px;
+        font-size: 0.72rem;
+        border-radius: 6px;
+    }
+
+    .order-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .order-summary li {
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+
+    .booking-actions {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .booking-actions .btn:last-child {
+        grid-column: 1 / -1;
+        justify-self: stretch;
     }
 }

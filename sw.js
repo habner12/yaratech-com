@@ -1,8 +1,8 @@
-const CACHE_NAME = 'trans-caranavi-v3';
+const CACHE_NAME = 'trans-caranavi-v7';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
-    './styles.css',
+    './styles.css?v=booking-steps-3',
     './script.js',
     './manifest.json',
     './ipsum.jpeg',
@@ -10,6 +10,8 @@ const ASSETS_TO_CACHE = [
     './flota.jpeg',
     './qr.jpeg',
     './caranavi.png',
+    './assets/icons/icon-192.png',
+    './assets/icons/icon-512.png',
     './Parque de Aventuras San Benito en Coroico.mp4',
     'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap',
     'https://unpkg.com/@phosphor-icons/web'

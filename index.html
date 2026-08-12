@@ -20,7 +20,7 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./styles.css?v=booking-steps-3">
 </head>
 <body>
 
@@ -294,151 +294,202 @@
         <div class="container">
             <div class="booking-container">
                 <div class="booking-info">
-                    <h2>Motor de Reserva Profesional</h2>
-                    <p>Visualiza el estado de ocupación del vehículo en tiempo real y asegura tus asientos completando el formulario.</p>
+                    <span class="booking-kicker">Excursion apta para todo publico</span>
+                    <h2>Booking de Excursion por Pasos</h2>
+                    <p>Selecciona el vehiculo, registra a cada pasajero y reserva asientos especificos para la salida turistica a San Benito.</p>
                     
                     <div class="seat-stats-box">
-                        <h4><i class="ph ph-chart-bar"></i> Estado del Vehículo Seleccionado</h4>
+                        <h4><i class="ph ph-chart-bar"></i> Ocupacion del Vehiculo Seleccionado</h4>
                         <div class="seat-stats">
                             <div class="stat-item">
-                                <span class="stat-label">Capacidad del Vehículo</span>
+                                <span class="stat-label">Capacidad</span>
                                 <span class="stat-val" id="capacidadTotal">14 asientos</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-label">Asientos Ocupados Hoy</span>
-                                <span class="stat-val" id="asientosOcupados">8</span>
+                                <span class="stat-label">Reservados 24h</span>
+                                <span class="stat-val" id="asientosOcupados">0</span>
                             </div>
                             <div class="stat-item highlight-green">
-                                <span class="stat-label">Asientos Disponibles</span>
-                                <span class="stat-val" id="asientosLibres">6</span>
+                                <span class="stat-label">Disponibles</span>
+                                <span class="stat-val" id="asientosLibres">14</span>
                             </div>
                         </div>
                         <div class="progress-bar-container">
-                            <div class="progress-bar-fill" id="progressBarFill" style="width: 57%;"></div>
+                            <div class="progress-bar-fill" id="progressBarFill" style="width: 0%;"></div>
                         </div>
                         <p class="helper-text" id="cuposMaxAviso"></p>
                     </div>
 
                     <div class="availability-alert" id="availabilityAlert">
-                        <i class="ph-fill ph-info"></i> Selecciona una fecha para ver disponibilidad.
+                        <i class="ph-fill ph-info"></i> Las reservas confirmadas quedan guardadas por 24 horas en este dispositivo.
                     </div>
                 </div>
                 
                 <div class="booking-card">
                     <form id="bookingForm" class="booking-form">
-                        <div class="form-group">
-                            <label for="fechaViaje"><i class="ph ph-calendar-blank"></i> Fecha de Salida</label>
-                            <input type="date" id="fechaViaje" required>
-                            <small id="fechaAviso" class="text-error hidden"></small>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="tipoTransporte"><i class="ph ph-car-profile"></i> Transporte</label>
-                                <select id="tipoTransporte" required>
-                                    <option value="ipsum" data-price="150" data-capacity="6">Ipsum (150 Bs. - Máx 6p)</option>
-                                    <option value="minibus" data-price="110" data-capacity="14" selected>Minibús (110 Bs. - Máx 14p)</option>
-                                    <option value="flota" data-price="80" data-capacity="40">Flota (80 Bs. - Máx 40p)</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="pasajeros"><i class="ph ph-users"></i> Pasajeros</label>
-                                <input type="number" id="pasajeros" min="1" max="14" value="1" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="nombreCompleto"><i class="ph ph-user"></i> Nombre Completo del Titular</label>
-                            <input type="text" id="nombreCompleto" placeholder="Ej. Juan Pérez" required>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="telefono"><i class="ph ph-whatsapp-logo"></i> WhatsApp / Celular</label>
-                                <input type="tel" id="telefono" placeholder="Ej. 75223813" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="carnet"><i class="ph ph-identification-badge"></i> C.I. / Pasaporte</label>
-                                <input type="text" id="carnet" placeholder="Ej. 9832483 LP" required>
-                            </div>
+                        <div class="booking-stepper" aria-label="Progreso de la reserva">
+                            <button type="button" class="step-pill active" data-step-indicator="1"><span>1</span> Viaje</button>
+                            <button type="button" class="step-pill" data-step-indicator="2"><span>2</span> Pasajeros</button>
+                            <button type="button" class="step-pill" data-step-indicator="3"><span>3</span> Asientos</button>
+                            <button type="button" class="step-pill" data-step-indicator="4"><span>4</span> Pago</button>
                         </div>
 
-                        <!-- Payment Method Accordion -->
-                        <div class="payment-section">
-                            <label><i class="ph ph-credit-card"></i> Selecciona un Método de Pago</label>
-                            
-                            <div class="payment-options">
-                                <div class="payment-option-card active" data-method="qr">
-                                    <input type="radio" name="payMethod" id="methodQR" checked>
-                                    <label for="methodQR">
-                                        <i class="ph ph-qr-code"></i>
-                                        <span>Pago por QR</span>
-                                    </label>
-                                </div>
-                                <div class="payment-option-card" data-method="tarjeta">
-                                    <input type="radio" name="payMethod" id="methodCard">
-                                    <label for="methodCard">
-                                        <i class="ph ph-credit-card"></i>
-                                        <span>Tarjeta</span>
-                                    </label>
-                                </div>
-                                <div class="payment-option-card" data-method="whatsapp">
-                                    <input type="radio" name="payMethod" id="methodWA">
-                                    <label for="methodWA">
-                                        <i class="ph ph-chat-circle-text"></i>
-                                        <span>Efectivo/Consulta</span>
-                                    </label>
-                                </div>
+                        <section class="booking-step active" data-step="1">
+                            <div class="step-heading">
+                                <span>Paso 1</span>
+                                <h3>Salida, vehiculo y cantidad</h3>
                             </div>
+                            <div class="form-group">
+                                <label for="fechaViaje"><i class="ph ph-calendar-blank"></i> Fecha de Salida</label>
+                                <input type="date" id="fechaViaje" required>
+                                <small id="fechaAviso" class="text-error hidden"></small>
+                            </div>
+                            <div class="vehicle-choice-grid" id="vehicleChoices">
+                                <button type="button" class="vehicle-choice" data-vehicle="ipsum">
+                                    <i class="ph ph-car-profile"></i>
+                                    <strong>Ipsum</strong>
+                                    <span>150 Bs. / Max 6p</span>
+                                </button>
+                                <button type="button" class="vehicle-choice active" data-vehicle="minibus">
+                                    <i class="ph ph-van"></i>
+                                    <strong>Mini Bus</strong>
+                                    <span>110 Bs. / Max 14p</span>
+                                </button>
+                                <button type="button" class="vehicle-choice" data-vehicle="flota">
+                                    <i class="ph ph-bus"></i>
+                                    <strong>Bus</strong>
+                                    <span>80 Bs. / 40+ pasajeros</span>
+                                </button>
+                            </div>
+                            <input type="hidden" id="tipoTransporte" value="minibus" data-price="110" data-capacity="14">
+                            <div class="passenger-counter">
+                                <label for="pasajeros"><i class="ph ph-users"></i> Numero de pasajeros</label>
+                                <div class="counter-control">
+                                    <button type="button" id="decreasePassengers" aria-label="Restar pasajero"><i class="ph ph-minus"></i></button>
+                                    <input type="number" id="pasajeros" min="1" max="14" value="1" required>
+                                    <button type="button" id="increasePassengers" aria-label="Agregar pasajero"><i class="ph ph-plus"></i></button>
+                                </div>
+                                <small id="passengerLimitHint">Puedes reservar hasta 14 pasajeros en Mini Bus.</small>
+                            </div>
+                            <div class="public-note">
+                                <i class="ph ph-heart"></i>
+                                <span>Excursion familiar, estudiantil y apta para todo publico. Cada pasajero debe tener sus datos registrados.</span>
+                            </div>
+                        </section>
 
-                            <!-- QR Box with real local image -->
-                            <div class="payment-details-box" id="payBoxQR">
-                                <div class="qr-container">
-                                    <div class="qr-image-box">
-                                        <img src="./qr.jpeg" alt="Código QR Real de Pago - Transporte Turístico Caranavi">
+                        <section class="booking-step" data-step="2">
+                            <div class="step-heading">
+                                <span>Paso 2</span>
+                                <h3>Datos de pasajeros</h3>
+                            </div>
+                            <div id="passengerForms" class="passenger-forms"></div>
+                        </section>
+
+                        <section class="booking-step" data-step="3">
+                            <div class="step-heading">
+                                <span>Paso 3</span>
+                                <h3>Seleccion de asientos</h3>
+                            </div>
+                            <div class="seat-map-wrap">
+                                <div class="seat-map-header">
+                                    <i class="ph ph-steering-wheel"></i>
+                                    <strong id="seatMapTitle">Mini Bus - 14 asientos</strong>
+                                </div>
+                                <div id="seatMap" class="seat-map minibus-map" aria-label="Mapa de asientos"></div>
+                                <div class="seat-legend">
+                                    <span><i class="legend-box available"></i> Libre</span>
+                                    <span><i class="legend-box selected"></i> Seleccionado</span>
+                                    <span><i class="legend-box booked"></i> Reservado</span>
+                                </div>
+                                <p id="seatSelectionHint" class="seat-selection-hint"></p>
+                            </div>
+                        </section>
+
+                        <section class="booking-step" data-step="4">
+                            <div class="step-heading">
+                                <span>Paso 4</span>
+                                <h3>Pago y confirmacion</h3>
+                            </div>
+                            <div class="order-summary" id="orderSummary"></div>
+                            <div class="payment-section">
+                                <label><i class="ph ph-credit-card"></i> Selecciona un Metodo de Pago</label>
+                                
+                                <div class="payment-options">
+                                    <div class="payment-option-card active" data-method="qr">
+                                        <input type="radio" name="payMethod" id="methodQR" checked>
+                                        <label for="methodQR">
+                                            <i class="ph ph-qr-code"></i>
+                                            <span>Pago por QR</span>
+                                        </label>
                                     </div>
-                                    <div class="qr-instructions">
-                                        <h5>Escanear QR de Pago</h5>
-                                        <p>Escanea este código QR desde la aplicación de banca móvil preferida de tu entidad financiera en Bolivia (Banco Unión, BNB, Mercantil, BCP, etc.) para procesar la transacción.</p>
-                                        <span class="qr-hint">Guarda el comprobante para enviarlo por WhatsApp.</span>
+                                    <div class="payment-option-card" data-method="tarjeta">
+                                        <input type="radio" name="payMethod" id="methodCard">
+                                        <label for="methodCard">
+                                            <i class="ph ph-credit-card"></i>
+                                            <span>Tarjeta</span>
+                                        </label>
+                                    </div>
+                                    <div class="payment-option-card" data-method="whatsapp">
+                                        <input type="radio" name="payMethod" id="methodWA">
+                                        <label for="methodWA">
+                                            <i class="ph ph-chat-circle-text"></i>
+                                            <span>Efectivo/Consulta</span>
+                                        </label>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Card Box -->
-                            <div class="payment-details-box hidden" id="payBoxCard">
-                                <div class="card-form-grid">
-                                    <div class="form-group">
-                                        <label for="cardNumber">Número de Tarjeta</label>
-                                        <input type="text" id="cardNumber" placeholder="4000 1234 5678 9010" maxlength="19">
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="cardExpiry">Vencimiento</label>
-                                            <input type="text" id="cardExpiry" placeholder="MM/AA" maxlength="5">
+                                <div class="payment-details-box" id="payBoxQR">
+                                    <div class="qr-container">
+                                        <div class="qr-image-box">
+                                            <img src="./qr.jpeg" alt="Codigo QR Real de Pago - Transporte Turistico Caranavi">
                                         </div>
-                                        <div class="form-group">
-                                            <label for="cardCvv">CVV</label>
-                                            <input type="password" id="cardCvv" placeholder="123" maxlength="3">
+                                        <div class="qr-instructions">
+                                            <h5>Escanear QR de Pago</h5>
+                                            <p>Escanea este codigo QR desde tu banca movil y guarda el comprobante para adjuntarlo por WhatsApp.</p>
+                                            <span class="qr-hint">La reserva se enviara con el detalle completo de pasajeros y asientos.</span>
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="payment-details-box hidden" id="payBoxCard">
+                                    <div class="card-form-grid">
+                                        <div class="form-group">
+                                            <label for="cardNumber">Numero de Tarjeta</label>
+                                            <input type="text" id="cardNumber" placeholder="4000 1234 5678 9010" maxlength="19">
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label for="cardExpiry">Vencimiento</label>
+                                                <input type="text" id="cardExpiry" placeholder="MM/AA" maxlength="5">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="cardCvv">CVV</label>
+                                                <input type="password" id="cardCvv" placeholder="123" maxlength="3">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="payment-details-box hidden" id="payBoxWA">
+                                    <p class="wa-payment-info"><i class="ph ph-info"></i> Coordinaremos el pago en efectivo o transferencia manual una vez se valide tu reserva.</p>
+                                </div>
                             </div>
 
-                            <!-- WhatsApp Box -->
-                            <div class="payment-details-box hidden" id="payBoxWA">
-                                <p class="wa-payment-info"><i class="ph ph-info"></i> Coordinaremos el pago en efectivo directamente en la boletería o mediante transferencia bancaria manual una vez se valide tu reserva.</p>
+                            <div class="price-summary">
+                                <span>Monto Total:</span>
+                                <h3 id="precioTotal">110 Bs.</h3>
                             </div>
-                        </div>
 
-                        <div class="price-summary">
-                            <span>Monto Total:</span>
-                            <h3 id="precioTotal">110 Bs.</h3>
-                        </div>
+                            <button type="submit" class="btn btn-whatsapp w-100 btn-lg" id="submitBookingBtn">
+                                <i class="ph-fill ph-whatsapp-logo"></i> Confirmar y Enviar a WhatsApp
+                            </button>
+                        </section>
 
-                        <button type="submit" class="btn btn-whatsapp w-100 btn-lg" id="submitBookingBtn">
-                            <i class="ph-fill ph-whatsapp-logo"></i> Confirmar & Enviar a WhatsApp
-                        </button>
+                        <div class="booking-actions">
+                            <button type="button" class="btn btn-outline" id="prevStepBtn"><i class="ph ph-arrow-left"></i> Regresar</button>
+                            <button type="button" class="btn btn-secondary" id="clearBookingBtn"><i class="ph ph-broom"></i> Limpiar</button>
+                            <button type="button" class="btn btn-primary" id="nextStepBtn">Continuar <i class="ph ph-arrow-right"></i></button>
+                        </div>
                     </form>
                 </div>
             </div>
