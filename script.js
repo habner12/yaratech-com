@@ -30,7 +30,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 3. Booking Engine Elements
+    // 3. Native Video Lightbox Modal (Los Tajibos style control)
+    const videoModal = document.getElementById('videoModal');
+    const modalVideo = document.getElementById('modalVideo');
+    const btnVerVideo = document.getElementById('btnVerVideo');
+    const closeModal = document.querySelector('.close-modal');
+
+    if (btnVerVideo && videoModal && modalVideo && closeModal) {
+        btnVerVideo.addEventListener('click', () => {
+            videoModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Disable background scrolling
+            
+            // Play video with audio unmuted on click
+            modalVideo.currentTime = 0;
+            modalVideo.muted = false;
+            
+            // Standard play promise pattern to avoid browser race condition errors
+            const playPromise = modalVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log("Video modal reproducido con éxito");
+                }).catch(error => {
+                    console.log("Auto-reproducción falló o requiere interacción del usuario:", error);
+                });
+            }
+        });
+
+        const closeVideoModal = () => {
+            modalVideo.pause();
+            videoModal.classList.add('hidden');
+            document.body.style.overflow = ''; // Re-enable scrolling
+        };
+
+        closeModal.addEventListener('click', closeVideoModal);
+
+        // Close when clicking outside content area
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) {
+                closeVideoModal();
+            }
+        });
+
+        // Close on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !videoModal.classList.contains('hidden')) {
+                closeVideoModal();
+            }
+        });
+    }
+
+    // 4. Booking Engine Elements
     const form = document.getElementById('bookingForm');
     const fechaInput = document.getElementById('fechaViaje');
     const fechaAviso = document.getElementById('fechaAviso');
@@ -52,7 +101,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
-    fechaInput.min = `${yyyy}-${mm}-${dd}`;
+    if (fechaInput) {
+        fechaInput.min = `${yyyy}-${mm}-${dd}`;
+    }
 
     // Deterministic state simulation per date and transport type
     let simulatedCapacity = 14;
@@ -60,6 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let simulatedFree = 6;
 
     function updateCapacityAndStats() {
+        if (!tipoTransporte || !pasajerosInput || !precioTotalEl) return;
+        
         const selectedOption = tipoTransporte.options[tipoTransporte.selectedIndex];
         const capacity = parseInt(selectedOption.dataset.capacity) || 14;
         const pricePerPerson = parseInt(selectedOption.dataset.price) || 110;
@@ -70,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
             pasajerosInput.value = capacity;
         }
 
-        const dateStr = fechaInput.value || `${yyyy}-${mm}-${dd}`;
+        const dateStr = (fechaInput && fechaInput.value) ? fechaInput.value : `${yyyy}-${mm}-${dd}`;
         
         // Generate a pseudo-random hash based on the combination of date and transport type
         let combinedStr = dateStr + selectedOption.value;
@@ -91,32 +144,46 @@ document.addEventListener('DOMContentLoaded', () => {
         const finalFree = simulatedFree - requestedPasajeros;
 
         // Update Text
-        capacidadTotalEl.textContent = `${simulatedCapacity} asientos`;
-        asientosOcupadosEl.textContent = simulatedBooked;
+        if (capacidadTotalEl) capacidadTotalEl.textContent = `${simulatedCapacity} asientos`;
+        if (asientosOcupadosEl) asientosOcupadosEl.textContent = simulatedBooked;
         
         if (finalFree >= 0) {
-            asientosLibresEl.textContent = finalFree;
-            asientosLibresEl.parentElement.className = 'stat-item highlight-green';
-            cuposMaxAviso.textContent = `Quedarán ${finalFree} asientos libres tras tu reserva.`;
-            cuposMaxAviso.style.color = '#4B5563';
-            submitBtn.removeAttribute('disabled');
-            submitBtn.style.opacity = '1';
+            if (asientosLibresEl) {
+                asientosLibresEl.textContent = finalFree;
+                asientosLibresEl.parentElement.className = 'stat-item highlight-green';
+            }
+            if (cuposMaxAviso) {
+                cuposMaxAviso.textContent = `Quedarán ${finalFree} asientos libres tras tu reserva.`;
+                cuposMaxAviso.style.color = '#4B5563';
+            }
+            if (submitBtn) {
+                submitBtn.removeAttribute('disabled');
+                submitBtn.style.opacity = '1';
+            }
         } else {
-            asientosLibresEl.textContent = 0;
-            asientosLibresEl.parentElement.className = 'stat-item text-error';
-            cuposMaxAviso.textContent = `¡Exceso de pasajeros! Solo quedan ${simulatedFree} asientos disponibles para esta fecha.`;
-            cuposMaxAviso.style.color = '#ef4444';
-            submitBtn.setAttribute('disabled', 'true');
-            submitBtn.style.opacity = '0.5';
+            if (asientosLibresEl) {
+                asientosLibresEl.textContent = 0;
+                asientosLibresEl.parentElement.className = 'stat-item text-error';
+            }
+            if (cuposMaxAviso) {
+                cuposMaxAviso.textContent = `¡Exceso de pasajeros! Solo quedan ${simulatedFree} asientos disponibles para esta fecha.`;
+                cuposMaxAviso.style.color = '#ef4444';
+            }
+            if (submitBtn) {
+                submitBtn.setAttribute('disabled', 'true');
+                submitBtn.style.opacity = '0.5';
+            }
         }
 
         // Fill Progress Bar
-        const percentage = Math.min(100, ((simulatedBooked + requestedPasajeros) / simulatedCapacity) * 100);
-        progressBarFill.style.width = `${percentage}%`;
-        if (percentage >= 90) {
-            progressBarFill.style.backgroundColor = '#ef4444'; // Red if almost full
-        } else {
-            progressBarFill.style.backgroundColor = 'var(--clr-secondary)';
+        if (progressBarFill) {
+            const percentage = Math.min(100, ((simulatedBooked + requestedPasajeros) / simulatedCapacity) * 100);
+            progressBarFill.style.width = `${percentage}%`;
+            if (percentage >= 90) {
+                progressBarFill.style.backgroundColor = '#ef4444'; // Red if almost full
+            } else {
+                progressBarFill.style.backgroundColor = 'var(--clr-secondary)';
+            }
         }
 
         // Price Update
@@ -124,42 +191,48 @@ document.addEventListener('DOMContentLoaded', () => {
         precioTotalEl.textContent = `${total} Bs.`;
 
         // Availability box text
-        if (fechaInput.value) {
-            if (finalFree >= 0) {
-                availabilityAlert.innerHTML = `<i class="ph-fill ph-check-circle" style="color:var(--clr-whatsapp)"></i> ¡Disponible! Puedes reservar tus ${requestedPasajeros} asientos para la fecha seleccionada.`;
-                availabilityAlert.style.borderLeftColor = 'var(--clr-whatsapp)';
+        if (availabilityAlert) {
+            if (fechaInput && fechaInput.value) {
+                if (finalFree >= 0) {
+                    availabilityAlert.innerHTML = `<i class="ph-fill ph-check-circle" style="color:var(--clr-whatsapp)"></i> ¡Disponible! Puedes reservar tus ${requestedPasajeros} asientos para la fecha seleccionada.`;
+                    availabilityAlert.style.borderLeftColor = 'var(--clr-whatsapp)';
+                } else {
+                    availabilityAlert.innerHTML = `<i class="ph-fill ph-warning-octagon" style="color:#ef4444"></i> Cupos insuficientes en el tipo de vehículo seleccionado.`;
+                    availabilityAlert.style.borderLeftColor = '#ef4444';
+                }
             } else {
-                availabilityAlert.innerHTML = `<i class="ph-fill ph-warning-octagon" style="color:#ef4444"></i> Cupos insuficientes en el tipo de vehículo seleccionado.`;
-                availabilityAlert.style.borderLeftColor = '#ef4444';
+                availabilityAlert.innerHTML = `<i class="ph-fill ph-info"></i> Selecciona una fecha para ver el estado de ocupación del transporte.`;
+                availabilityAlert.style.borderLeftColor = 'var(--clr-secondary)';
             }
-        } else {
-            availabilityAlert.innerHTML = `<i class="ph-fill ph-info"></i> Selecciona una fecha para ver el estado de ocupación del transporte.`;
-            availabilityAlert.style.borderLeftColor = 'var(--clr-secondary)';
         }
     }
 
     // Date Validation
-    fechaInput.addEventListener('change', (e) => {
-        const selectedDate = new Date(e.target.value + 'T12:00:00');
-        const day = selectedDate.getDay(); // 0 = Sunday, 5 = Friday, 6 = Saturday
-        
-        if (day !== 0 && day !== 5 && day !== 6) {
-            fechaAviso.classList.remove('hidden');
-            fechaAviso.textContent = 'Salidas regulares son Viernes, Sábado y Domingo. Otras fechas bajo consulta.';
-            fechaAviso.style.color = 'var(--clr-secondary)';
-        } else {
-            fechaAviso.classList.add('hidden');
-        }
-        updateCapacityAndStats();
-    });
+    if (fechaInput) {
+        fechaInput.addEventListener('change', (e) => {
+            const selectedDate = new Date(e.target.value + 'T12:00:00');
+            const day = selectedDate.getDay(); // 0 = Sunday, 5 = Friday, 6 = Saturday
+            
+            if (fechaAviso) {
+                if (day !== 0 && day !== 5 && day !== 6) {
+                    fechaAviso.classList.remove('hidden');
+                    fechaAviso.textContent = 'Salidas regulares son Viernes, Sábado y Domingo. Otras fechas bajo consulta.';
+                    fechaAviso.style.color = 'var(--clr-secondary)';
+                } else {
+                    fechaAviso.classList.add('hidden');
+                }
+            }
+            updateCapacityAndStats();
+        });
+    }
 
-    tipoTransporte.addEventListener('change', updateCapacityAndStats);
-    pasajerosInput.addEventListener('input', updateCapacityAndStats);
+    if (tipoTransporte) tipoTransporte.addEventListener('change', updateCapacityAndStats);
+    if (pasajerosInput) pasajerosInput.addEventListener('input', updateCapacityAndStats);
 
     // Initial load
     updateCapacityAndStats();
 
-    // 4. Payment Method Logic
+    // 5. Payment Method Logic
     const optionCards = document.querySelectorAll('.payment-option-card');
     const payBoxes = {
         qr: document.getElementById('payBoxQR'),
@@ -183,40 +256,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Show/Hide details boxes
             Object.keys(payBoxes).forEach(key => {
-                if (key === method) {
-                    payBoxes[key].classList.remove('hidden');
-                } else {
-                    payBoxes[key].classList.add('hidden');
+                if (payBoxes[key]) {
+                    if (key === method) {
+                        payBoxes[key].classList.remove('hidden');
+                    } else {
+                        payBoxes[key].classList.add('hidden');
+                    }
                 }
             });
         });
     });
 
-    // 5. Submit Reservation to WhatsApp
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const fecha = fechaInput.value;
-        const transporteOption = tipoTransporte.options[tipoTransporte.selectedIndex].text;
-        const pasajeros = pasajerosInput.value;
-        const nombre = document.getElementById('nombreCompleto').value;
-        const telefono = document.getElementById('telefono').value;
-        const carnet = document.getElementById('carnet').value;
-        const total = precioTotalEl.textContent;
+    // 6. Submit Reservation to WhatsApp
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const fecha = fechaInput.value;
+            const transporteOption = tipoTransporte.options[tipoTransporte.selectedIndex].text;
+            const pasajeros = pasajerosInput.value;
+            const nombre = document.getElementById('nombreCompleto').value;
+            const telefono = document.getElementById('telefono').value;
+            const carnet = document.getElementById('carnet').value;
+            const total = precioTotalEl.textContent;
 
-        let pagoTexto = 'Efectivo / Coordinar por WhatsApp';
-        if (selectedPaymentMethod === 'qr') {
-            pagoTexto = 'Pago por transferencia QR (adjuntaré comprobante)';
-        } else if (selectedPaymentMethod === 'tarjeta') {
-            const cardNum = document.getElementById('cardNumber').value || '•••• •••• •••• ••••';
-            pagoTexto = `Pago con Tarjeta de Crédito/Débito (${cardNum.slice(-4)})`;
-        }
+            let pagoTexto = 'Efectivo / Coordinar por WhatsApp';
+            if (selectedPaymentMethod === 'qr') {
+                pagoTexto = 'Pago por transferencia QR (adjuntaré comprobante)';
+            } else if (selectedPaymentMethod === 'tarjeta') {
+                const cardNum = document.getElementById('cardNumber').value || '•••• •••• •••• ••••';
+                pagoTexto = `Pago con Tarjeta de Crédito/Débito (${cardNum.slice(-4)})`;
+            }
 
-        const itinerarioResumen = `📍 Partida: 06:30 AM - Sede UMSA Caranavi
+            const itinerarioResumen = `📍 Partida: 06:30 AM - Sede UMSA Caranavi
 🕒 Llegada: 09:30 AM - San Benito
 🎒 Retorno: 17:00 PM - Retorno a Caranavi`;
 
-        const mensaje = `🌿 *TRANSPORTE TURÍSTICO CARANAVI* 🌿
+            const mensaje = `🌿 *TRANSPORTE TURÍSTICO CARANAVI* 🌿
 ¡Hola! Quiero confirmar una reserva de traslado turístico:
 
 👤 *Titular:* ${nombre}
@@ -235,23 +311,29 @@ ${itinerarioResumen}
 
 Por favor, confirmen mi reservación. ¡Gracias!`;
 
-        const encodedMensaje = encodeURIComponent(mensaje);
-        const numeroEmpresa = '59175223813'; // Target business number
-        const whatsappUrl = `https://api.whatsapp.com/send?phone=${numeroEmpresa}&text=${encodedMensaje}`;
-        
-        window.open(whatsappUrl, '_blank');
-    });
+            const encodedMensaje = encodeURIComponent(mensaje);
+            const numeroEmpresa = '59175223813'; // Target business number
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=${numeroEmpresa}&text=${encodedMensaje}`;
+            
+            window.open(whatsappUrl, '_blank');
+        });
+    }
 });
 
 // Selector function from cards
 window.selectTransport = function(type) {
     const selector = document.getElementById('tipoTransporte');
-    selector.value = type;
-    
-    // Trigger change event to update details
-    const event = new Event('change');
-    selector.dispatchEvent(event);
+    if (selector) {
+        selector.value = type;
+        
+        // Trigger change event to update details
+        const event = new Event('change');
+        selector.dispatchEvent(event);
+    }
     
     // Smooth scroll to booking
-    document.getElementById('reserva').scrollIntoView({ behavior: 'smooth' });
+    const target = document.getElementById('reserva');
+    if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+    }
 };

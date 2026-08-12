@@ -216,29 +216,45 @@ a {
     color: var(--clr-primary);
 }
 
-/* Hero Section */
+/* Hero Section with Video Background */
 .hero {
     position: relative;
     height: 100vh;
     min-height: 650px;
     display: flex;
     align-items: center;
-    /* Beautiful Tropical Yungas / Caranavi background */
-    background-image: url('https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&q=80&w=1920');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    overflow: hidden;
+    background-color: var(--clr-dark);
+}
+
+.hero-video-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    overflow: hidden;
+}
+
+/* Los Tajibos style background video */
+.hero-video-bg video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.45;
 }
 
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(4, 120, 87, 0.85) 0%, rgba(17, 24, 39, 0.8) 100%);
+    background: linear-gradient(135deg, rgba(4, 120, 87, 0.7) 0%, rgba(17, 24, 39, 0.75) 100%);
+    z-index: 1;
 }
 
 .hero-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     color: var(--clr-white);
     max-width: 800px;
 }
@@ -295,12 +311,88 @@ a {
     color: #4B5563;
 }
 
-/* Cards Grid */
-.grid {
-    display: grid;
-    gap: 2rem;
+/* Route & Destination Section */
+.route-grid {
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 2.5rem;
 }
 
+.route-card {
+    background: var(--clr-light);
+    border: 1px solid #E5E7EB;
+    border-radius: var(--border-radius-lg);
+    padding: 2.5rem;
+    display: flex;
+    gap: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.route-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.route-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: var(--clr-white);
+    flex-shrink: 0;
+}
+
+.route-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.route-info h3 {
+    font-size: 1.35rem;
+    color: var(--clr-dark);
+    margin-bottom: 0.25rem;
+}
+
+.route-tag {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: var(--clr-secondary);
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.route-info p {
+    color: #4B5563;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.route-details {
+    list-style: none;
+    border-top: 1px solid #E5E7EB;
+    padding-top: 1rem;
+}
+
+.route-details li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.route-details li i {
+    color: var(--clr-primary);
+}
+
+/* Cards Grid */
 .cards-grid {
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
@@ -757,30 +849,25 @@ input:focus, select:focus {
     gap: 1.5rem;
 }
 
-.qr-image-placeholder {
-    position: relative;
+/* Renders real local QR image perfectly */
+.qr-image-box {
     width: 130px;
     height: 130px;
     background-color: var(--clr-white);
     border: 1px solid #E5E7EB;
     border-radius: var(--border-radius-sm);
+    padding: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem;
+    flex-shrink: 0;
 }
 
-.qr-center-logo {
-    position: absolute;
-    background-color: var(--clr-white);
-    padding: 0.25rem;
+.qr-image-box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
     border-radius: 4px;
-    box-shadow: var(--shadow-sm);
-}
-
-.qr-center-logo i {
-    color: var(--clr-primary);
-    font-size: 1.25rem;
 }
 
 .qr-instructions h5 {
@@ -846,6 +933,69 @@ input:focus, select:focus {
     font-size: 2.5rem;
     color: var(--clr-primary);
     font-weight: 800;
+}
+
+/* Lightbox Modal for Full Video view */
+.video-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.video-modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 500px; /* Adjust layout width since YouTube Short is 9:16 vertical video */
+    background: #000;
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+}
+
+.close-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: var(--clr-white);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: background var(--transition-fast);
+}
+
+.close-modal:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.video-responsive {
+    position: relative;
+    padding-bottom: 177.77%; /* 9:16 ratio for Youtube Shorts */
+    height: 0;
+    overflow: hidden;
+}
+
+.video-responsive video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* Footer */
@@ -977,6 +1127,12 @@ input:focus, select:focus {
         width: 100%;
         flex-direction: column;
         align-items: stretch;
+    }
+    
+    .route-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
     }
     
     .timeline::before {

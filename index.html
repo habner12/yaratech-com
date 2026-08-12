@@ -32,7 +32,8 @@
                 <span>TransCaranavi</span>
             </a>
             <div class="nav-links">
-                <a href="#tarifas">Vehículos y Tarifas</a>
+                <a href="#destinos">Nuestra Ruta</a>
+                <a href="#tarifas">Flota & Tarifas</a>
                 <a href="#itinerario">Itinerario</a>
                 <a href="#reserva" class="btn btn-primary">Reservar</a>
                 <button id="installAppBtn" class="btn btn-outline hidden">
@@ -42,8 +43,15 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- Hero Section with Native Background Video (Los Tajibos Style) -->
     <header class="hero">
+        <div class="hero-video-bg">
+            <!-- Native HTML5 Video for smooth loop, autoplay, muted, playsinline. Poster fallback is caranavi.png -->
+            <video autoplay loop muted playsinline poster="./caranavi.png" id="bgVideo">
+                <source src="./Parque de Aventuras San Benito en Coroico.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
         <div class="hero-overlay"></div>
         <div class="container hero-content">
             <span class="badge">Ecoturismo Profesional — Yungas</span>
@@ -53,26 +61,65 @@
                 <a href="#reserva" class="btn btn-primary btn-lg">
                     Reservar mi Asiento <i class="ph ph-arrow-right"></i>
                 </a>
-                <a href="#itinerario" class="btn btn-secondary btn-lg">
-                    Ver Itinerario <i class="ph ph-map-trifold"></i>
-                </a>
+                <button id="btnVerVideo" class="btn btn-secondary btn-lg">
+                    <i class="ph ph-play-circle"></i> Ver Video con Sonido
+                </button>
             </div>
         </div>
     </header>
+
+    <!-- Ruta y Destinos -->
+    <section id="destinos" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Nuestra Ruta Turística</h2>
+                <p>Conoce los detalles geográficos y las facilidades del punto de partida en Caranavi y tu destino final en Coroico.</p>
+            </div>
+            
+            <div class="grid route-grid">
+                <!-- Partida Card -->
+                <div class="route-card">
+                    <div class="route-icon bg-green"><i class="ph ph-graduation-cap"></i></div>
+                    <div class="route-info">
+                        <h3>Partida: Sede Universitaria UMSA</h3>
+                        <span class="route-tag">Caranavi, La Paz</span>
+                        <p>La sede universitaria de la UMSA es el epicentro de coordinación de nuestras salidas regulares. Contamos con un espacio amplio y seguro para el pre-embarque, verificación de listas de pasajeros, y control rápido de equipaje. Zona de fácil acceso vehicular y peatonal en el centro del municipio de Caranavi.</p>
+                        <ul class="route-details">
+                            <li><i class="ph ph-clock"></i> <strong>Punto de encuentro:</strong> 06:00 AM</li>
+                            <li><i class="ph ph-shield"></i> <strong>Seguridad:</strong> Personal de control y asistencia a bordo</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Destino Card -->
+                <div class="route-card">
+                    <div class="route-icon bg-orange"><i class="ph ph-tree"></i></div>
+                    <div class="route-info">
+                        <h3>Destino: San Benito</h3>
+                        <span class="route-tag">Municipio de Coroico — Yungas</span>
+                        <p>San Benito es un paraíso escondido a 1,750 m.s.n.m. en el Municipio de Coroico. Famoso por su clima cálido-subtropical templado, plantaciones de café yungueño de alta calidad, y majestuosos senderos ecológicos. Un lugar ideal para desconectarse, realizar caminatas fotográficas y bañarse en sus arroyos naturales de agua cristalina.</p>
+                        <ul class="route-details">
+                            <li><i class="ph ph-thermometer-hot"></i> <strong>Clima:</strong> Promedio de 24°C (Tropical húmedo)</li>
+                            <li><i class="ph ph-compass"></i> <strong>Atractivos:</strong> Cascadas, miradores de selva y cafetales</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Tarifas / Vehículos Section -->
     <section id="tarifas" class="section bg-light">
         <div class="container">
             <div class="section-header">
                 <h2>Nuestra Flota de Transporte</h2>
-                <p>Vehículos verdaderos preparados para las rutas yungueñas. Elige tu nivel de confort.</p>
+                <p>Vehículos reales y listos para las rutas yungueñas. Elige tu nivel de confort.</p>
             </div>
             
             <div class="grid cards-grid">
                 <!-- Ipsum Card -->
                 <div class="card vehicle-card">
                     <div class="card-image">
-                        <!-- Local Image for Ipsum -->
                         <img src="./ipsum.jpeg" alt="Vehículo Ipsum - Transporte Turístico Caranavi">
                         <div class="card-badge">Premium</div>
                     </div>
@@ -92,7 +139,6 @@
                 <!-- Minibús Card -->
                 <div class="card vehicle-card">
                     <div class="card-image">
-                        <!-- Local Image for Minibus -->
                         <img src="./minibus.jpeg" alt="Minibús - Transporte Turístico Caranavi">
                         <div class="card-badge bg-orange">Más Popular</div>
                     </div>
@@ -112,7 +158,6 @@
                 <!-- Flota Card -->
                 <div class="card vehicle-card">
                     <div class="card-image">
-                        <!-- Local Image for Flota -->
                         <img src="./flota.jpeg" alt="Bus Flota - Transporte Turístico Caranavi">
                         <div class="card-badge bg-green">Ideal Delegaciones</div>
                     </div>
@@ -136,7 +181,7 @@
     <section id="itinerario" class="section">
         <div class="container">
             <div class="section-header">
-                <h2>Itinerario Detallado</h2>
+                <h2>Itinerario Detallado del Viaje</h2>
                 <p>Nuestra ruta programada para garantizar una aventura inolvidable de ida y vuelta.</p>
             </div>
             
@@ -346,17 +391,15 @@
                                 </div>
                             </div>
 
-                            <!-- QR Box -->
+                            <!-- QR Box with real local image -->
                             <div class="payment-details-box" id="payBoxQR">
                                 <div class="qr-container">
-                                    <div class="qr-image-placeholder">
-                                        <!-- Simulated QR code using modern styles -->
-                                        <i class="ph ph-qr-code" style="font-size: 8rem; color: var(--clr-dark);"></i>
-                                        <div class="qr-center-logo"><i class="ph ph-compass"></i></div>
+                                    <div class="qr-image-box">
+                                        <img src="./qr.jpeg" alt="Código QR Real de Pago - Transporte Turístico Caranavi">
                                     </div>
                                     <div class="qr-instructions">
-                                        <h5>Escanear QR Simple</h5>
-                                        <p>Escanea este código desde tu aplicación bancaria móvil autorizada en Bolivia (Banco Unión, BNB, Mercantil, etc.) para realizar la transferencia.</p>
+                                        <h5>Escanear QR de Pago</h5>
+                                        <p>Escanea este código QR desde la aplicación de banca móvil preferida de tu entidad financiera en Bolivia (Banco Unión, BNB, Mercantil, BCP, etc.) para procesar la transacción.</p>
                                         <span class="qr-hint">Guarda el comprobante para enviarlo por WhatsApp.</span>
                                     </div>
                                 </div>
@@ -402,6 +445,20 @@
         </div>
     </section>
 
+    <!-- Video Modal Lightbox (Native HTML5 Video) -->
+    <div id="videoModal" class="video-modal hidden">
+        <div class="video-modal-content">
+            <button class="close-modal"><i class="ph ph-x"></i></button>
+            <div class="video-responsive">
+                <!-- Native video with audio control for standard pop-up playback -->
+                <video id="modalVideo" controls playsinline>
+                    <source src="./Parque de Aventuras San Benito en Coroico.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container footer-content">
@@ -411,6 +468,7 @@
             </div>
             <div class="footer-links">
                 <h4>Enlaces Rápidos</h4>
+                <a href="#destinos">Nuestra Ruta</a>
                 <a href="#tarifas">Tarifas</a>
                 <a href="#itinerario">Itinerario</a>
                 <a href="#reserva">Reservas</a>
