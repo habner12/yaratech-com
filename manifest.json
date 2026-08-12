@@ -1,21 +1,22 @@
 {
-  "name": "YARA POS - Aparatos Electrónicos",
-  "short_name": "YARA POS",
-  "description": "Sistema de Punto de Venta moderno para YARA.",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#F0F2F5",
-  "theme_color": "#007BFF",
-  "icons": [
-    {
-      "src": "assets/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "assets/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+    "name": "Trans Turístico Caranavi",
+    "short_name": "TransCaranavi",
+    "description": "Servicio de transporte turístico desde Caranavi al Lugar Turístico San Benito en Los Yungas.",
+    "start_url": "/index.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#059669",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "https://via.placeholder.com/192x192.png?text=TTC",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "https://via.placeholder.com/512x512.png?text=TTC",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ]
 }
