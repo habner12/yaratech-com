@@ -111,29 +111,39 @@ document.addEventListener('DOMContentLoaded', () => {
         fechaInput.value = `${yyyy}-${mm}-${dd}`;
     }
 
+    let receiptBase64 = '';
+    const receiptFileInput = document.getElementById('receiptFile');
+    const receiptPreview = document.getElementById('receiptPreview');
+    const receiptUploadLabel = document.getElementById('receiptUploadLabel');
+
+    if (receiptFileInput) {
+        receiptFileInput.addEventListener('change', () => {
+            const file = receiptFileInput.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                receiptBase64 = e.target.result;
+                if (receiptPreview) {
+                    receiptPreview.src = e.target.result;
+                    receiptPreview.style.display = 'block';
+                }
+                if (receiptUploadLabel) {
+                    receiptUploadLabel.textContent = '✓ Comprobante adjuntado correctamente';
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
     function getReservations() {
-        const now = Date.now();
-        let reservations = [];
-        try {
-            reservations = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        } catch {
-            reservations = [];
-        }
-        const activeReservations = reservations.filter(item => item.expiresAt > now);
-        if (activeReservations.length !== reservations.length) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(activeReservations));
-        }
-        return activeReservations;
+        return window.YaraDB ? window.YaraDB.getReservations() : [];
     }
 
     function saveReservation(record) {
-        const reservations = getReservations();
-        reservations.push({
-            ...record,
-            createdAt: Date.now(),
-            expiresAt: Date.now() + DAY_MS
-        });
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(reservations));
+        if (window.YaraDB) {
+            return window.YaraDB.saveReservation(record);
+        }
+        return record;
     }
 
     function getDateKey() {
@@ -141,10 +151,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getBookedSeats() {
-        const date = getDateKey();
-        return getReservations()
-            .filter(item => item.date === date && item.vehicle === booking.vehicle)
-            .flatMap(item => item.seats);
+        if (window.YaraDB) {
+            return window.YaraDB.getBookedSeats(getDateKey(), booking.vehicle);
+        }
+        return [];
     }
 
     function collectPassengerData() {
@@ -468,7 +478,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (form) {
+    const loadingModal = document.getElementById('paymentLoadingModal');
+    const loadingState = document.getElementById('modalLoadingState');
+    const successState = document.getElementById('modalSuccessState');
+    const btnDownloadPDF = document.getElementById('btnDownloadPDF');
+    const btnCloseSuccessModal = document.getElementById('btnCloseSuccessModal');
+
+    if (form && loadingModal && loadingState && successState && btnDownloadPDF && btnCloseSuccessModal) {
         form.addEventListener('submit', (event) => {
             event.preventDefault();
             if (!validateStep(1) || !validateStep(2) || !validateStep(3)) return;
@@ -485,28 +501,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 paymentText = `Pago con tarjeta terminacion ${cardNumber.slice(-4) || 'pendiente'}`;
             }
 
-            saveReservation({
+            const record = {
+                type: 'Transporte',
                 date: getDateKey(),
                 vehicle: booking.vehicle,
                 seats: [...booking.selectedSeats],
                 passengers,
                 total,
-                payment: booking.payment
-            });
+                payment: booking.payment,
+                paymentStatus: booking.payment === 'tarjeta' ? 'Confirmado' : 'Pendiente',
+                status: booking.payment === 'tarjeta' ? 'Aceptada' : 'Pendiente',
+                receiptImage: booking.payment === 'qr' ? receiptBase64 : ''
+            };
 
-            const passengerLines = passengers.map((passenger, index) => (
-                `${index + 1}. Asiento ${booking.selectedSeats[index]} - ${passenger.name} - Doc: ${passenger.document} - Tel: ${passenger.phone}`
-            )).join('\n');
+            const savedRecord = saveReservation(record);
 
-            const message = `TRANSPORTE TURISTICO CARANAVI
+            // Open payment modal
+            loadingModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            const triggerWhatsApp = () => {
+                const passengerLines = passengers.map((passenger, index) => (
+                    `${index + 1}. Asiento ${booking.selectedSeats[index]} - ${passenger.name} - Doc: ${passenger.document} - Tel: ${passenger.phone}`
+                )).join('\n');
+
+                const message = `TRANSPORTE TURISTICO CARANAVI
 Hola, quiero confirmar una reserva de excursion:
 
+Código de Reserva: ${savedRecord.code}
 Fecha de viaje: ${getDateKey()}
 Transporte: ${vehicle.label}
 Pasajeros: ${booking.passengers}
 Asientos reservados: ${booking.selectedSeats.join(', ')}
 Total a pagar: ${total}
 Metodo de pago: ${paymentText}
+Estado de Pago: ${savedRecord.paymentStatus}
 
 DATOS DE PASAJEROS
 ${passengerLines}
@@ -518,9 +547,142 @@ Retorno: 17:00 PM - Retorno a Caranavi
 
 Por favor, confirmen mi reservacion. Gracias.`;
 
-            renderAll();
-            const whatsappUrl = `https://api.whatsapp.com/send?phone=${businessWhatsApp}&text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
+                const whatsappUrl = `https://api.whatsapp.com/send?phone=${businessWhatsApp}&text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+            };
+
+            // Set up download PDF action
+            btnDownloadPDF.onclick = () => {
+                if (window.YaraDB && savedRecord) {
+                    window.YaraDB.downloadPDF(savedRecord.id);
+                }
+            };
+
+            // Set up WhatsApp optional button action
+            const btnSendWA = document.getElementById('btnSendWA');
+            if (btnSendWA) {
+                btnSendWA.onclick = triggerWhatsApp;
+            }
+
+            // Set up close button action
+            btnCloseSuccessModal.onclick = () => {
+                loadingModal.classList.add('hidden');
+                document.body.style.overflow = '';
+                
+                // Reset form steps
+                booking.step = 1;
+                booking.passengers = 1;
+                booking.selectedSeats = [];
+                receiptBase64 = '';
+                if (receiptPreview) receiptPreview.style.display = 'none';
+                if (receiptUploadLabel) receiptUploadLabel.textContent = 'Toca para adjuntar tu comprobante de pago';
+                updateVehicle('minibus');
+            };
+
+            if (booking.payment === 'tarjeta') {
+                loadingState.classList.remove('hidden');
+                successState.classList.add('hidden');
+
+                // Simulate credit card charge validation
+                setTimeout(() => {
+                    loadingState.classList.add('hidden');
+                    successState.classList.remove('hidden');
+                    // Auto-download PDF ticket on card payment confirmation
+                    if (window.YaraDB && savedRecord) {
+                        window.YaraDB.downloadPDF(savedRecord.id);
+                    }
+                }, 2000);
+            } else {
+                loadingState.classList.add('hidden');
+                successState.classList.remove('hidden');
+                // Adjust text for non-credit card payment method
+                const descText = successState.querySelector('p');
+                if (descText) {
+                    descText.innerHTML = `Tu reserva se guardó como <strong>Pendiente de Pago</strong>. Se ha descargado tu ticket temporal. Envía el comprobante para confirmar tu pago.`;
+                }
+                // Auto-download PDF ticket
+                if (window.YaraDB && savedRecord) {
+                    window.YaraDB.downloadPDF(savedRecord.id);
+                }
+            }
+        });
+    }
+
+    // Reservation Lookup Search logic
+    const lookupBtn = document.getElementById('lookupBtn');
+    const lookupInput = document.getElementById('lookupInput');
+    const lookupResult = document.getElementById('lookupResult');
+
+    if (lookupBtn && lookupInput && lookupResult) {
+        lookupBtn.addEventListener('click', () => {
+            const q = lookupInput.value.trim();
+            if (!q) {
+                lookupResult.classList.add('hidden');
+                return;
+            }
+            if (!window.YaraDB) return;
+            const r = window.YaraDB.getReservationByCodeOrCI(q);
+            lookupResult.classList.remove('hidden');
+            if (!r) {
+                lookupResult.innerHTML = `
+                    <div style="background-color:#fee2e2; border:1px solid #fca5a5; border-radius:8px; padding:1rem; color:#b91c1c; font-size:0.9rem; margin-top:1rem;">
+                        <i class="ph ph-warning-circle"></i> No se encontró ninguna reserva con ese código o C.I.
+                    </div>
+                `;
+                return;
+            }
+            
+            const isApproved = r.status === 'Aceptada';
+            const statusColor = r.status === 'Aceptada' ? '#065f46' : (r.status === 'Rechazada' ? '#991b1b' : '#92400e');
+            const statusBg = r.status === 'Aceptada' ? '#d1fae5' : (r.status === 'Rechazada' ? '#fee2e2' : '#fef3c7');
+            
+            let detailsHtml = `
+                <div style="background-color:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; padding:1.25rem; margin-top:1rem; text-align:left;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+                        <span style="font-size:1.2rem; font-weight:800; color:var(--clr-primary);">${r.code}</span>
+                        <span style="background-color:${statusBg}; color:${statusColor}; font-weight:700; padding:0.25rem 0.6rem; border-radius:99px; font-size:0.8rem;">${r.status}</span>
+                    </div>
+                    <p style="font-size:0.9rem; margin-bottom:0.5rem; color:#4b5563;"><strong>Fecha de viaje:</strong> ${r.date}</p>
+                    <p style="font-size:0.9rem; margin-bottom:0.5rem; color:#4b5563;"><strong>Detalle:</strong> ${r.type} ${r.vehicle ? `(${r.vehicle.toUpperCase()})` : (r.tourPlan ? `(${r.tourPlan})` : '')}</p>
+                    <p style="font-size:0.9rem; margin-bottom:0.5rem; color:#4b5563;"><strong>Total:</strong> ${r.total}</p>
+                    <p style="font-size:0.9rem; margin-bottom:1rem; color:#4b5563;"><strong>Pago:</strong> ${r.paymentStatus} (${r.payment.toUpperCase()})</p>
+                    
+                    <ul style="border-top:1px solid #e5e7eb; padding-top:0.75rem; margin-bottom:1.25rem; list-style:none;">
+            `;
+            
+            r.passengers.forEach((p, idx) => {
+                const seatText = r.seats && r.seats[idx] ? ` - Asiento ${r.seats[idx]}` : '';
+                detailsHtml += `
+                    <li style="font-size:0.88rem; margin-bottom:0.25rem; color:#374151;">• <strong>${escapeHtml(p.name)}</strong> - CI: ${escapeHtml(p.document)}${seatText}</li>
+                `;
+            });
+            
+            detailsHtml += `
+                    </ul>
+            `;
+            
+            if (isApproved) {
+                detailsHtml += `
+                    <button class="btn btn-primary w-100" onclick="window.YaraDB.downloadPDF(${r.id})">
+                        <i class="ph ph-download-simple"></i> Descargar Ticket Confirmado
+                    </button>
+                `;
+            } else {
+                detailsHtml += `
+                    <div style="background-color:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:0.85rem; color:#92400e; font-size:0.85rem;">
+                        <i class="ph ph-info"></i> Su reserva está pendiente de confirmación de pago por el administrador.
+                    </div>
+                `;
+            }
+            
+            detailsHtml += `</div>`;
+            lookupResult.innerHTML = detailsHtml;
+        });
+
+        lookupInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                lookupBtn.click();
+            }
         });
     }
 

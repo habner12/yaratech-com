@@ -1637,3 +1637,75 @@ input:focus, select:focus {
         justify-self: stretch;
     }
 }
+
+/* ==========================================
+   Admin Panel Styles
+   ========================================== */
+.admin-body {
+    background-color: var(--clr-light);
+}
+
+.admin-section {
+    padding: 3rem 0;
+}
+
+.kpi-card {
+    background: var(--clr-white);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast);
+}
+
+.kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.admin-table {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.admin-table th, .admin-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #E5E7EB;
+    font-size: 0.95rem;
+}
+
+.admin-table tbody tr:hover {
+    background-color: rgba(243, 244, 246, 0.5);
+}
+
+.admin-table th {
+    background-color: #F9FAFB;
+    font-weight: 700;
+}
+
+.admin-table td {
+    color: #374151;
+}
+
+/* Spinner styling for card simulation */
+.spinner {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--clr-primary);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+    .admin-table th:nth-child(3),
+    .admin-table td:nth-child(3),
+    .admin-table th:nth-child(6),
+    .admin-table td:nth-child(6) {
+        display: none; /* Hide date and payment method on small screens for table spacing */
+    }
+}
+

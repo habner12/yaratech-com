@@ -35,6 +35,7 @@
                 <a href="#destinos">Nuestra Ruta</a>
                 <a href="#tarifas">Flota & Tarifas</a>
                 <a href="#itinerario">Itinerario</a>
+                <a href="./necroturismo.html" style="color: var(--clr-secondary); font-weight: 700;"><i class="ph ph-ghost"></i> Necro Turismo</a>
                 <a href="#reserva" class="btn btn-primary">Reservar</a>
                 <button id="installAppBtn" class="btn btn-outline hidden">
                     <i class="ph ph-download-simple"></i> Instalar App
@@ -289,6 +290,27 @@
         </div>
     </section>
 
+    <!-- Necro Turismo Package Section -->
+    <section id="necro-promo" class="section" style="background-color: #0c0a21; color: white;">
+        <div class="container">
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3rem; align-items: center;">
+                <div style="text-align: center;">
+                    <img src="./bannernecro.jpeg" alt="Banner Necro Turismo Caranavi" style="width: 100%; max-width: 420px; border-radius: var(--border-radius-lg); border: 3px solid var(--clr-secondary); box-shadow: var(--shadow-lg);">
+                </div>
+                <div>
+                    <span class="badge" style="background-color: var(--clr-secondary); border: none;">¡Nuevo Paquete Especial!</span>
+                    <h2 style="color: var(--clr-white); font-family: var(--font-heading); font-size: 2.3rem; margin-bottom: 1rem;">Paquete Turístico: Necro Turismo Caranavi</h2>
+                    <p style="color: #d1d5db; margin-bottom: 1.5rem; line-height: 1.7;">
+                        Descubre una experiencia mística e histórica inigualable en Caranavi. Explora los senderos históricos del camposanto con nuestros planes <strong>Diurno</strong> (historia y fundadores) y <strong>Nocturno</strong> (mitos, leyendas, antorchas y fogata).
+                    </p>
+                    <a href="./necroturismo.html" class="btn btn-secondary btn-lg">
+                        <i class="ph ph-ghost"></i> Ver Detalles y Reservar Tour
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Booking Engine Section -->
     <section id="reserva" class="section booking-section">
         <div class="container">
@@ -439,14 +461,19 @@
                                 </div>
 
                                 <div class="payment-details-box" id="payBoxQR">
-                                    <div class="qr-container">
+                                    <div class="qr-container" style="flex-wrap:wrap;">
                                         <div class="qr-image-box">
                                             <img src="./qr.jpeg" alt="Codigo QR Real de Pago - Transporte Turistico Caranavi">
                                         </div>
                                         <div class="qr-instructions">
                                             <h5>Escanear QR de Pago</h5>
-                                            <p>Escanea este codigo QR desde tu banca movil y guarda el comprobante para adjuntarlo por WhatsApp.</p>
-                                            <span class="qr-hint">La reserva se enviara con el detalle completo de pasajeros y asientos.</span>
+                                            <p>Realiza la transferencia desde tu banca móvil y <strong>adjunta la foto del comprobante</strong> para que el administrador valide tu pago.</p>
+                                            <div id="receiptDropZone" onclick="document.getElementById('receiptFile').click()" style="border:2px dashed #D1D5DB;border-radius:8px;padding:1rem;text-align:center;cursor:pointer;margin-top:.75rem;transition:border-color .2s;" onmouseenter="this.style.borderColor='var(--clr-primary)'" onmouseleave="this.style.borderColor='#D1D5DB'">
+                                                <i class="ph ph-upload-simple" style="font-size:1.8rem;color:var(--clr-primary);"></i>
+                                                <p id="receiptUploadLabel" style="font-size:.82rem;color:#6B7280;margin-top:.35rem;">Toca para adjuntar tu comprobante de pago</p>
+                                                <input type="file" id="receiptFile" accept="image/*" capture="environment" style="position:absolute;opacity:0;width:0;height:0;">
+                                            </div>
+                                            <img id="receiptPreview" alt="Vista previa del comprobante" style="max-width:100%;max-height:120px;border-radius:8px;margin-top:.75rem;display:none;">
                                         </div>
                                     </div>
                                 </div>
@@ -510,6 +537,51 @@
         </div>
     </div>
 
+    <!-- Simulating Payment / Success Modal -->
+    <div id="paymentLoadingModal" class="video-modal hidden" style="background: rgba(9, 9, 11, 0.85); display: flex; align-items: center; justify-content: center; z-index: 2000;">
+        <div class="card" style="width: 90%; max-width: 450px; padding: 3rem; text-align: center; border-radius: var(--border-radius-lg); border: 2px solid var(--clr-primary);">
+            <div id="modalLoadingState">
+                <div class="spinner"></div>
+                <h3 style="margin-bottom: 0.5rem; font-size:1.4rem;">Procesando Pago Seguro...</h3>
+                <p style="color:#6B7280; font-size:0.9rem;">Espera un momento mientras establecemos conexión con la red bancaria local.</p>
+            </div>
+            
+            <div id="modalSuccessState" class="hidden">
+                <i class="ph ph-check-circle" style="font-size: 5rem; color: #10B981; display: block; margin: 0 auto 1rem;"></i>
+                <h3 style="margin-bottom: 0.5rem; font-size:1.5rem;">¡Reserva Confirmada!</h3>
+                <p style="color:#6B7280; font-size:0.9rem; margin-bottom: 2rem;">Tu pago ha sido validado correctamente y tu reserva ha sido guardada en la base de datos.</p>
+                
+                <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                    <button class="btn btn-primary w-100" id="btnDownloadPDF">
+                        <i class="ph ph-download-simple"></i> Descargar Ticket PDF
+                    </button>
+                    <button class="btn btn-outline w-100" id="btnSendWA" style="border-color:var(--clr-whatsapp);color:var(--clr-whatsapp);">
+                        <i class="ph-fill ph-whatsapp-logo"></i> Enviar por WhatsApp (opcional)
+                    </button>
+                    <button class="btn btn-outline w-100" id="btnCloseSuccessModal" style="border-color:#E5E7EB; color:#6B7280;">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Booking Lookup Section -->
+    <section id="consultar" class="section bg-light">
+        <div class="container" style="max-width:700px;">
+            <div class="section-header">
+                <h2>Consultar mi Reserva</h2>
+                <p>Ingresa tu código de reserva (ej: <code style="background:#E5E7EB;padding:.1rem .4rem;border-radius:4px;">TR-4820</code>) o tu número de C.I. para verificar el estado y descargar tu ticket oficial.</p>
+            </div>
+            <div class="card" style="padding:2rem;">
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                    <input type="text" id="lookupInput" placeholder="Código TR-XXXX o número de C.I." style="flex:1;min-width:200px;">
+                    <button class="btn btn-primary" id="lookupBtn" style="white-space:nowrap;"><i class="ph ph-magnifying-glass"></i> Buscar</button>
+                </div>
+                <div id="lookupResult" class="hidden" style="margin-top:1.25rem;"></div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container footer-content">
@@ -523,6 +595,8 @@
                 <a href="#tarifas">Tarifas</a>
                 <a href="#itinerario">Itinerario</a>
                 <a href="#reserva">Reservas</a>
+                <a href="./necroturismo.html">Necro Turismo</a>
+                <a href="./admin.html">Panel Admin</a>
             </div>
             <div class="footer-contact">
                 <h4>Sede Caranavi</h4>
@@ -535,6 +609,10 @@
         </div>
     </footer>
 
+    <!-- jsPDF CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Database Script -->
+    <script src="./db.js"></script>
     <!-- App Script -->
     <script src="./script.js"></script>
 </body>

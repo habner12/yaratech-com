@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - TransCaranavi</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- jsPDF CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="./styles.css?v=booking-steps-3">
+</head>
+<body class="admin-body">
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="./index.html" class="logo">
+                <i class="ph-fill ph-compass"></i>
+                <span>TransCaranavi <small style="font-size:0.6em;color:var(--clr-secondary);font-weight:700;">ADMIN</small></span>
+            </a>
+            <div class="nav-links">
+                <a href="./index.html" class="btn btn-outline">
+                    <i class="ph ph-house"></i> Volver a la Web
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Content Section -->
+    <section class="section admin-section" style="margin-top: 5rem;">
+        <div class="container">
+            <div class="admin-header">
+                <h2>Panel de Control de Reservas</h2>
+                <p>Gestiona y valida las reservas de transporte turístico y paquetes de Necro Turismo.</p>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="grid kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+                <div class="card kpi-card" style="padding: 1.5rem; text-align: center; border-left: 5px solid var(--clr-primary);">
+                    <i class="ph ph-receipt" style="font-size: 2.5rem; color: var(--clr-primary); margin-bottom: 0.5rem;"></i>
+                    <h4 style="color:#6B7280; font-size: 0.9rem; text-transform: uppercase;">Total Reservas</h4>
+                    <span id="kpiTotal" style="font-size: 2rem; font-weight: 800; color: var(--clr-dark);">0</span>
+                </div>
+                <div class="card kpi-card" style="padding: 1.5rem; text-align: center; border-left: 5px solid var(--clr-whatsapp);">
+                    <i class="ph ph-check-circle" style="font-size: 2.5rem; color: var(--clr-whatsapp); margin-bottom: 0.5rem;"></i>
+                    <h4 style="color:#6B7280; font-size: 0.9rem; text-transform: uppercase;">Aceptadas</h4>
+                    <span id="kpiAceptadas" style="font-size: 2rem; font-weight: 800; color: var(--clr-dark);">0</span>
+                </div>
+                <div class="card kpi-card" style="padding: 1.5rem; text-align: center; border-left: 5px solid var(--clr-secondary);">
+                    <i class="ph ph-clock-counter-clockwise" style="font-size: 2.5rem; color: var(--clr-secondary); margin-bottom: 0.5rem;"></i>
+                    <h4 style="color:#6B7280; font-size: 0.9rem; text-transform: uppercase;">Pendientes</h4>
+                    <span id="kpiPendientes" style="font-size: 2rem; font-weight: 800; color: var(--clr-dark);">0</span>
+                </div>
+                <div class="card kpi-card" style="padding: 1.5rem; text-align: center; border-left: 5px solid var(--clr-secondary-dark);">
+                    <i class="ph ph-coins" style="font-size: 2.5rem; color: var(--clr-secondary-dark); margin-bottom: 0.5rem;"></i>
+                    <h4 style="color:#6B7280; font-size: 0.9rem; text-transform: uppercase;">Ingresos Est.</h4>
+                    <span id="kpiIngresos" style="font-size: 2rem; font-weight: 800; color: var(--clr-dark);">0 Bs.</span>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="card admin-filters-card" style="padding: 2rem; margin-bottom: 2rem; background: var(--clr-light); border: 1px solid #E5E7EB; border-radius: var(--border-radius-md);">
+                <h3 style="margin-bottom: 1.25rem; font-size: 1.2rem; display:flex; align-items:center; gap:0.5rem;"><i class="ph ph-funnel"></i> Filtros de Búsqueda</h3>
+                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="filterSearch"><i class="ph ph-magnifying-glass"></i> Buscar por Pasajero / CI</label>
+                        <input type="text" id="filterSearch" placeholder="Ej. Juan Pérez o 1234567">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="filterType"><i class="ph ph-tag"></i> Tipo de Reserva</label>
+                        <select id="filterType">
+                            <option value="all">Todos los tipos</option>
+                            <option value="Transporte">Transporte Regular</option>
+                            <option value="Necro Turismo">Necro Turismo</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="filterStatus"><i class="ph ph-shield-check"></i> Estado</label>
+                        <select id="filterStatus">
+                            <option value="all">Todos los estados</option>
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="Aceptada">Aceptada</option>
+                            <option value="Rechazada">Rechazada</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reservations Table -->
+            <div class="card table-card" style="padding: 2rem; overflow-x: auto; background: var(--clr-white); border: 1px solid #E5E7EB; border-radius: var(--border-radius-md); box-shadow: var(--shadow-sm);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+                    <h3 style="font-size: 1.35rem; display:flex; align-items:center; gap:0.5rem;"><i class="ph ph-list-bullets"></i> Listado de Reservas</h3>
+                    <button class="btn btn-outline" id="btnResetDB" style="padding: 0.5rem 1rem; font-size: 0.85rem;"><i class="ph ph-arrows-counter-clockwise"></i> Reiniciar Base de Datos</button>
+                </div>
+                
+                <table class="admin-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #E5E7EB; color: #4B5563; font-weight: 700;">
+                            <th style="padding: 1rem 0.75rem;">Código</th>
+                            <th style="padding: 1rem 0.75rem;">Tipo / Plan</th>
+                            <th style="padding: 1rem 0.75rem;">Fecha</th>
+                            <th style="padding: 1rem 0.75rem;">Pasajeros</th>
+                            <th style="padding: 1rem 0.75rem;">Total</th>
+                            <th style="padding: 1rem 0.75rem;">Método Pago</th>
+                            <th style="padding: 1rem 0.75rem;">Estado</th>
+                            <th style="padding: 1rem 0.75rem; text-align: right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reservationsTableBody">
+                        <!-- Cargar dinámicamente -->
+                    </tbody>
+                </table>
+                <div id="noDataMessage" class="hidden" style="text-align: center; padding: 3rem 1rem; color: #6B7280;">
+                    <i class="ph ph-folder-open" style="font-size: 3.5rem; opacity: 0.5; display: block; margin-bottom: 0.5rem;"></i>
+                    No se encontraron reservas con los filtros aplicados.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comprobante Preview Modal -->
+    <div id="receiptModal" class="video-modal hidden" style="background: rgba(9, 9, 11, 0.85); display: flex; align-items: center; justify-content: center; z-index: 2000;">
+        <div class="card" style="width: 90%; max-width: 500px; padding: 2rem; text-align: center; border-radius: var(--border-radius-lg); background: white; color: var(--clr-dark);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #E5E7EB; padding-bottom: 0.5rem;">
+                <h3 style="font-size: 1.25rem; font-family: var(--font-heading); color: var(--clr-dark); display: flex; align-items: center; gap: 0.5rem;"><i class="ph ph-image"></i> Comprobante de Pago</h3>
+                <button id="closeReceiptModal" style="border: none; background: transparent; cursor: pointer; font-size: 1.5rem; color: #9CA3AF;"><i class="ph ph-x"></i></button>
+            </div>
+            <div style="max-height: 400px; overflow-y: auto; display: flex; align-items: center; justify-content: center; background-color: #F3F4F6; border-radius: 8px; padding: 0.5rem;">
+                <img id="receiptModalImg" src="" alt="Comprobante cargado por el cliente" style="max-width: 100%; height: auto; border-radius: 4px;">
+            </div>
+            <button id="btnAcceptFromReceipt" class="btn btn-primary w-100" style="margin-top: 1rem; background-color:#059669;"><i class="ph ph-check"></i> Aprobar Pago y Reserva</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer" style="margin-top: 5rem;">
+        <div class="container footer-bottom">
+            <p>&copy; 2026 Transporte Turístico Caranavi. Panel Web de Control Interno.</p>
+        </div>
+    </footer>
+
+    <!-- Database Script -->
+    <script src="./db.js"></script>
+
+    <!-- Panel Administration Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableBody = document.getElementById('reservationsTableBody');
+            const noDataMessage = document.getElementById('noDataMessage');
+            
+            // Filters
+            const filterSearch = document.getElementById('filterSearch');
+            const filterType = document.getElementById('filterType');
+            const filterStatus = document.getElementById('filterStatus');
+            const btnResetDB = document.getElementById('btnResetDB');
+
+            // KPIs
+            const kpiTotal = document.getElementById('kpiTotal');
+            const kpiAceptadas = document.getElementById('kpiAceptadas');
+            const kpiPendientes = document.getElementById('kpiPendientes');
+            const kpiIngresos = document.getElementById('kpiIngresos');
+
+            function loadDashboard() {
+                if (!window.YaraDB) {
+                    console.error("YaraDB no cargado.");
+                    return;
+                }
+                const reservations = window.YaraDB.getReservations();
+                
+                // Calculate KPIs
+                let total = reservations.length;
+                let aceptadas = 0;
+                let pendientes = 0;
+                let ingresos = 0;
+
+                reservations.forEach(r => {
+                    if (r.status === 'Aceptada') {
+                        aceptadas++;
+                        // Parse Bs. value from total string (e.g. "220 Bs." -> 220)
+                        const numericVal = parseFloat(r.total.replace(/[^0-9.]/g, '')) || 0;
+                        ingresos += numericVal;
+                    } else if (r.status === 'Pendiente') {
+                        pendientes++;
+                    }
+                });
+
+                kpiTotal.textContent = total;
+                kpiAceptadas.textContent = aceptadas;
+                kpiPendientes.textContent = pendientes;
+                kpiIngresos.textContent = `${ingresos} Bs.`;
+
+                // Render Table with Filters
+                renderTable(reservations);
+            }
+
+            function renderTable(reservations) {
+                const searchVal = filterSearch.value.toLowerCase().trim();
+                const typeVal = filterType.value;
+                const statusVal = filterStatus.value;
+
+                const filtered = reservations.filter(r => {
+                    // Filter Search (matches code, passengers names or documents)
+                    const matchesSearch = !searchVal || 
+                        r.code.toLowerCase().includes(searchVal) ||
+                        r.passengers.some(p => 
+                            p.name.toLowerCase().includes(searchVal) || 
+                            p.document.toLowerCase().includes(searchVal)
+                        );
+
+                    // Filter Type
+                    const matchesType = typeVal === 'all' || r.type === typeVal;
+
+                    // Filter Status
+                    const matchesStatus = statusVal === 'all' || r.status === statusVal;
+
+                    return matchesSearch && matchesType && matchesStatus;
+                });
+
+                // Sort by creation date descending
+                filtered.sort((a, b) => b.createdAt - a.createdAt);
+
+                if (filtered.length === 0) {
+                    tableBody.innerHTML = '';
+                    noDataMessage.classList.remove('hidden');
+                    return;
+                }
+                noDataMessage.classList.add('hidden');
+
+                tableBody.innerHTML = filtered.map(r => {
+                    // Type styling
+                    const typeLabel = r.type === 'Necro Turismo' 
+                        ? `<span style="background: rgba(147, 51, 234, 0.1); color: rgb(147, 51, 234); font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;"><i class="ph-fill ph-ghost"></i> Necro: ${r.tourPlan === 'diurno' ? 'Día' : 'Noche'}</span>`
+                        : `<span style="background: rgba(5, 150, 105, 0.1); color: var(--clr-primary-dark); font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;"><i class="ph-fill ph-van"></i> Trans: ${r.vehicle.toUpperCase()}</span>`;
+
+                    // Status Badge styling
+                    let statusBadge = '';
+                    if (r.status === 'Aceptada') {
+                        statusBadge = `<span style="background: #D1FAE5; color: #065F46; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Aceptada</span>`;
+                    } else if (r.status === 'Rechazada') {
+                        statusBadge = `<span style="background: #FEE2E2; color: #991B1B; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Rechazada</span>`;
+                    } else {
+                        statusBadge = `<span style="background: #FEF3C7; color: #92400E; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Pendiente</span>`;
+                    }
+
+                    // Payment details
+                    const payMethodName = {
+                        qr: '<i class="ph ph-qr-code"></i> QR',
+                        tarjeta: '<i class="ph ph-credit-card"></i> Tarjeta',
+                        whatsapp: '<i class="ph ph-whatsapp-logo"></i> Efectivo'
+                    }[r.payment] || r.payment;
+
+                    const payStatusBadge = r.paymentStatus === 'Confirmado'
+                        ? `<small style="display:block; color:#059669; font-weight:700;"><i class="ph ph-shield-check"></i> Pagado</small>`
+                        : `<small style="display:block; color:#EA580C; font-weight:700;"><i class="ph ph-hourglass"></i> Pendiente</small>`;
+
+                    // Passenger details presentation
+                    const passengersList = r.passengers.map((p, idx) => {
+                        const seatText = r.type === 'Transporte' && r.seats[idx] ? ` [Asiento ${r.seats[idx]}]` : '';
+                        return `<div style="font-size:0.88rem;">• <strong>${escapeHtml(p.name)}</strong> - CI: ${escapeHtml(p.document)}${seatText}</div>`;
+                    }).join('');
+
+                    // Action buttons
+                    let actionButtons = '';
+                    if (r.status === 'Pendiente') {
+                        actionButtons += `
+                            <button class="btn btn-primary btn-accept" data-id="${r.id}" style="padding: 0.35rem 0.6rem; font-size:0.8rem; background-color:#059669; margin-right:0.25rem;" title="Aceptar reserva"><i class="ph ph-check"></i></button>
+                            <button class="btn btn-secondary btn-reject" data-id="${r.id}" style="padding: 0.35rem 0.6rem; font-size:0.8rem; background-color:#EF4444; margin-right:0.25rem;" title="Rechazar reserva"><i class="ph ph-x"></i></button>
+                        `;
+                    }
+                    
+                    // Comprobante button
+                    const receiptBtn = r.receiptImage
+                        ? `<button class="btn btn-outline btn-receipt" data-id="${r.id}" style="padding: 0.35rem 0.6rem; font-size:0.8rem; border-color:#10B981; color:#10B981; margin-right:0.25rem;" title="Ver Comprobante"><i class="ph ph-image"></i></button>`
+                        : '';
+
+                    // PDF and Delete action buttons
+                    actionButtons += receiptBtn + `
+                        <button class="btn btn-outline btn-pdf" data-id="${r.id}" style="padding: 0.35rem 0.6rem; font-size:0.8rem; border-color:#3B82F6; color:#3B82F6; margin-right:0.25rem;" title="Descargar Ticket PDF"><i class="ph ph-file-pdf"></i></button>
+                        <button class="btn btn-outline btn-delete" data-id="${r.id}" style="padding: 0.35rem 0.6rem; font-size:0.8rem; border-color:#9CA3AF; color:#ef4444;" title="Eliminar"><i class="ph ph-trash"></i></button>
+                    `;
+
+                    return `
+                        <tr style="border-bottom: 1px solid #E5E7EB; vertical-align: middle;">
+                            <td style="padding: 1rem 0.75rem; font-weight: 700; color: var(--clr-dark);">${r.code}</td>
+                            <td style="padding: 1rem 0.75rem;">${typeLabel}</td>
+                            <td style="padding: 1rem 0.75rem; font-size: 0.9rem;">${r.date}</td>
+                            <td style="padding: 1rem 0.75rem; max-width: 250px;">${passengersList}</td>
+                            <td style="padding: 1rem 0.75rem; font-weight: 700; color: var(--clr-secondary-dark);">${r.total}</td>
+                            <td style="padding: 1rem 0.75rem; font-size: 0.9rem;">
+                                <div>${payMethodName}</div>
+                                ${payStatusBadge}
+                            </td>
+                            <td style="padding: 1rem 0.75rem;">${statusBadge}</td>
+                            <td style="padding: 1rem 0.75rem; text-align: right; white-space: nowrap;">
+                                ${actionButtons}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                // Attach Event Listeners
+                document.querySelectorAll('.btn-accept').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.currentTarget.dataset.id;
+                        window.YaraDB.updateReservation(id, { status: 'Aceptada', paymentStatus: 'Confirmado' });
+                        loadDashboard();
+                    });
+                });
+
+                document.querySelectorAll('.btn-reject').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.currentTarget.dataset.id;
+                        window.YaraDB.updateReservation(id, { status: 'Rechazada' });
+                        loadDashboard();
+                    });
+                });
+
+                document.querySelectorAll('.btn-delete').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if (confirm("¿Estás seguro de que deseas eliminar esta reserva?")) {
+                            const id = e.currentTarget.dataset.id;
+                            window.YaraDB.deleteReservation(id);
+                            loadDashboard();
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.btn-pdf').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.currentTarget.dataset.id;
+                        if (window.YaraDB.downloadPDF) {
+                            window.YaraDB.downloadPDF(id);
+                        } else {
+                            alert("La funcionalidad de generación de PDF se está cargando. Intente de nuevo.");
+                        }
+                    });
+                });
+
+                // Attach Receipt Image View listeners
+                document.querySelectorAll('.btn-receipt').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.currentTarget.dataset.id;
+                        currentReceiptId = id;
+                        const res = window.YaraDB.getReservations().find(item => item.id == id);
+                        if (res && res.receiptImage) {
+                            const modalImg = document.getElementById('receiptModalImg');
+                            const approveBtn = document.getElementById('btnAcceptFromReceipt');
+                            if (modalImg) modalImg.src = res.receiptImage;
+                            if (approveBtn) {
+                                approveBtn.style.display = res.status === 'Pendiente' ? 'block' : 'none';
+                            }
+                            const modal = document.getElementById('receiptModal');
+                            if (modal) {
+                                modal.classList.remove('hidden');
+                                document.body.style.overflow = 'hidden';
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Receipt Modal close and accept bindings
+            let currentReceiptId = null;
+            const receiptModal = document.getElementById('receiptModal');
+            const closeReceiptModalBtn = document.getElementById('closeReceiptModal');
+            const btnAcceptFromReceipt = document.getElementById('btnAcceptFromReceipt');
+
+            const closeReceiptModal = () => {
+                if (receiptModal) {
+                    receiptModal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
+            };
+
+            if (closeReceiptModalBtn) {
+                closeReceiptModalBtn.addEventListener('click', closeReceiptModal);
+            }
+
+            if (receiptModal) {
+                receiptModal.addEventListener('click', (e) => {
+                    if (e.target === receiptModal) closeReceiptModal();
+                });
+            }
+
+            if (btnAcceptFromReceipt) {
+                btnAcceptFromReceipt.addEventListener('click', () => {
+                    if (currentReceiptId) {
+                        window.YaraDB.updateReservation(currentReceiptId, { status: 'Aceptada', paymentStatus: 'Confirmado' });
+                        closeReceiptModal();
+                        loadDashboard();
+                    }
+                });
+            }
+
+            function escapeHtml(value) {
+                return String(value || '').replace(/[&<>"']/g, char => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[char]));
+            }
+
+            // Filters Events
+            filterSearch.addEventListener('input', loadDashboard);
+            filterType.addEventListener('change', loadDashboard);
+            filterStatus.addEventListener('change', loadDashboard);
+
+            btnResetDB.addEventListener('click', () => {
+                if (confirm("¿Deseas restablecer la base de datos local a los valores iniciales? Esto borrará los cambios locales.")) {
+                    localStorage.removeItem('transCaranaviReservationsV1');
+                    window.YaraDB.initSeeds();
+                    loadDashboard();
+                }
+            });
+
+            // Initial Load
+            loadDashboard();
+        });
+    </script>
+</body>
+</html>

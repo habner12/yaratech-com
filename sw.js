@@ -1,20 +1,25 @@
-const CACHE_NAME = 'trans-caranavi-v7';
+const CACHE_NAME = 'trans-caranavi-v8';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './styles.css?v=booking-steps-3',
     './script.js',
+    './db.js',
+    './necroturismo.html',
+    './admin.html',
     './manifest.json',
     './ipsum.jpeg',
     './minibus.jpeg',
     './flota.jpeg',
     './qr.jpeg',
     './caranavi.png',
+    './bannernecro.jpeg',
     './assets/icons/icon-192.png',
     './assets/icons/icon-512.png',
     './Parque de Aventuras San Benito en Coroico.mp4',
     'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap',
-    'https://unpkg.com/@phosphor-icons/web'
+    'https://unpkg.com/@phosphor-icons/web',
+    'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
 ];
 
 // Install Event

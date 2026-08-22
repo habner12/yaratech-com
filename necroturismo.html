@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Necroturismo "Memorias y Leyendas de Caranavi"</title>
+    <meta name="theme-color" content="#1e1b4b">
+    <meta name="description" content="Descubre una faceta diferente de Caranavi: historia, arquitectura funeraria, mitos y leyendas. Tour Diurno 08:00–17:00 | Tour Nocturno 18:00–22:00.">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="./styles.css?v=booking-steps-3">
+    <style>
+        :root {
+            --clr-necro-bg: #09090b;
+            --clr-necro-card: #18181b;
+            --clr-necro-accent: #a855f7;
+            --clr-necro-accent-dark: #7e22ce;
+            --clr-necro-text: #f4f4f5;
+            --clr-necro-muted: #a1a1aa;
+        }
+        body { background-color: var(--clr-necro-bg); color: var(--clr-necro-text); }
+        body h1,body h2,body h3,body h4 { color: var(--clr-necro-text); }
+
+        /* Navbar */
+        .navbar { background-color: rgba(9,9,11,0.92); border-bottom: 1px solid #27272a; }
+        .navbar a { color: #d4d4d8; }
+        .navbar a:hover { color: var(--clr-necro-accent); }
+
+        /* Hero */
+        .necro-hero {
+            background: linear-gradient(180deg, rgba(15,12,38,0.82) 0%, rgba(9,9,11,1) 100%), url('./bannernecro.jpeg') center/cover no-repeat;
+            min-height: 72vh; display: flex; align-items: center; position: relative; padding-top: 5rem;
+        }
+        .necro-title { font-family:'Cinzel',serif; font-size: clamp(1.8rem,5vw,3.5rem); color: var(--clr-necro-accent) !important; text-shadow:0 0 18px rgba(168,85,247,0.4); font-weight:800; margin-bottom:.75rem; }
+        .necro-kicker { background:rgba(168,85,247,0.12); border:1px solid rgba(168,85,247,0.3); color:#d8b4fe !important; }
+
+        /* Sections */
+        .necro-section { padding:5rem 0; background-color: var(--clr-necro-bg); }
+        .necro-section-alt { padding:5rem 0; background-color:#0c0a21; border-top:1px solid #27272a; border-bottom:1px solid #27272a; }
+        .necro-card { background:var(--clr-necro-card); border:1px solid #27272a; border-radius: var(--border-radius-lg); }
+        .necro-label { color:var(--clr-necro-accent); font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; display:block; margin-bottom:.35rem; }
+        .necro-divider { height:1px; background: linear-gradient(90deg, transparent, rgba(168,85,247,.4), transparent); margin:2.5rem 0; border:none; }
+
+        /* Precio */
+        .plan-price-big { font-size:2.4rem; font-weight:800; color:var(--clr-necro-accent); }
+        .plan-price-big span { font-size:1rem; color:var(--clr-necro-muted); font-weight:500; }
+
+        /* Video */
+        .video-box { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius: var(--border-radius-md); border:2px solid #27272a; box-shadow:0 10px 20px rgba(0,0,0,.5); background:#000; }
+        .video-box video { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; }
+
+        /* Plan selector buttons */
+        .plan-choice { display:flex; min-height:120px; flex-direction:column; align-items:flex-start; justify-content:space-between; padding:1.25rem; border:2px solid #27272a; border-radius: var(--border-radius-sm); background:#09090b; cursor:pointer; transition:all .2s; color:var(--clr-necro-text); width:100%; text-align:left; }
+        .plan-choice i { color:var(--clr-necro-accent); font-size:2rem; }
+        .plan-choice strong { font-size:1.05rem; }
+        .plan-choice span { font-size:.85rem; color:var(--clr-necro-muted); }
+        .plan-choice.active { border-color:var(--clr-necro-accent); background:rgba(168,85,247,.08); box-shadow:0 0 0 4px rgba(168,85,247,.15); }
+
+        /* Form card */
+        .necro-form-card { background:var(--clr-necro-card); border:1px solid #27272a; border-radius:var(--border-radius-lg); padding:2.5rem; color:var(--clr-necro-text); }
+        .necro-form-card input,.necro-form-card select,.necro-form-card textarea { background:#09090b; border-color:#27272a; color:var(--clr-necro-text); }
+        .necro-form-card input:focus,.necro-form-card select:focus,.necro-form-card textarea:focus { border-color:var(--clr-necro-accent); box-shadow:0 0 0 4px rgba(168,85,247,.18); background:#09090b; outline:none; }
+        .necro-form-card label { color:#d4d4d8; }
+        .necro-form-card label i { color:var(--clr-necro-accent); }
+        .necro-form-card .step-pill { background:#18181b; border-color:#27272a; color:#a1a1aa; }
+        .necro-form-card .step-pill span { background:#27272a; color:#a1a1aa; }
+        .necro-form-card .step-pill.active { border-color:var(--clr-necro-accent); background:rgba(168,85,247,.08); color:#d8b4fe; }
+        .necro-form-card .step-pill.active span { background:var(--clr-necro-accent); color:#fff; }
+        .necro-form-card .step-pill.complete { border-color:var(--clr-necro-accent); background:rgba(168,85,247,.05); color:#c4b5fd; }
+        .necro-form-card .step-pill.complete span { background:var(--clr-necro-accent-dark); color:#fff; }
+
+        /* Passenger card */
+        .necro-pax-card { background:#09090b; border:1px solid #27272a; border-radius: var(--border-radius-sm); padding:1.25rem; margin-bottom:1rem; }
+        .necro-pax-card h4 { color:var(--clr-necro-accent); display:flex; gap:.5rem; align-items:center; margin-bottom:1rem; font-size:1rem; }
+
+        /* Payment */
+        .necro-pay-opt { border:2px solid #27272a; background:#09090b; border-radius: var(--border-radius-sm); padding:1rem .5rem; text-align:center; cursor:pointer; transition:all .2s; }
+        .necro-pay-opt.active { border-color:var(--clr-necro-accent); background:rgba(168,85,247,.06); }
+        .necro-pay-opt label { cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:.4rem; margin:0; }
+        .necro-pay-opt label i { font-size:1.6rem; color:#71717a; }
+        .necro-pay-opt label span { font-size:.8rem; font-weight:700; color:#71717a; }
+        .necro-pay-opt.active label i,.necro-pay-opt.active label span { color:var(--clr-necro-accent); }
+        .necro-pay-opt input[type="radio"] { position:absolute; opacity:0; width:0; height:0; }
+
+        /* Pay details box */
+        .necro-pay-box { background:#09090b; border:1px solid #27272a; border-radius: var(--border-radius-sm); padding:1.5rem; margin-bottom:1rem; animation:fadeIn .25s ease; }
+
+        /* Receipt upload */
+        .receipt-upload { border:2px dashed #27272a; border-radius: var(--border-radius-sm); padding:1.5rem; text-align:center; cursor:pointer; transition:border-color .2s; }
+        .receipt-upload:hover { border-color:var(--clr-necro-accent); }
+        .receipt-upload input[type="file"] { position:absolute; opacity:0; width:0; height:0; }
+        .receipt-preview { max-width:100%; max-height:160px; border-radius:8px; margin-top:1rem; display:none; }
+
+        /* Occupancy box */
+        .necro-occ-box { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius: var(--border-radius-lg); padding:1.5rem; margin-bottom:1.5rem; }
+        .necro-occ-box h4 { display:flex; align-items:center; gap:.5rem; margin-bottom:1rem; font-size:1.1rem; color:#e4e4e7; }
+        .necro-occ-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:.85rem; margin-bottom:1rem; }
+        .necro-occ-stat { background:rgba(255,255,255,.04); padding:.85rem; border-radius: var(--border-radius-sm); text-align:center; border:1px solid rgba(255,255,255,.08); }
+        .necro-occ-stat .label { display:block; font-size:.72rem; text-transform:uppercase; letter-spacing:.5px; margin-bottom:.35rem; opacity:.7; }
+        .necro-occ-stat .val { font-size:1.3rem; font-weight:800; }
+        .necro-progress-bar { height:8px; background:rgba(255,255,255,.12); border-radius:4px; overflow:hidden; }
+        .necro-progress-fill { height:100%; background:var(--clr-necro-accent); transition:width .5s ease; }
+
+        /* Order summary */
+        .necro-order-summary { display:grid; grid-template-columns:repeat(2,1fr); gap:.75rem; background:#09090b; border:1px solid #27272a; border-radius: var(--border-radius-sm); padding:1rem; }
+        .necro-order-summary div { display:flex; flex-direction:column; gap:.2rem; }
+        .necro-order-summary span { color:#71717a; font-size:.75rem; font-weight:800; text-transform:uppercase; }
+        .necro-order-summary strong { color:var(--clr-necro-text); }
+        .necro-order-summary ul { grid-column:1/-1; list-style:none; border-top:1px solid #27272a; padding-top:.75rem; margin-top:.5rem; }
+        .necro-order-summary li { display:flex; justify-content:space-between; gap:1rem; padding:.4rem 0; color:#d4d4d8; font-size:.88rem; }
+
+        /* Discount badge */
+        .discount-badge { display:inline-flex; align-items:center; gap:.35rem; background:rgba(168,85,247,.15); color:#d8b4fe; border:1px solid rgba(168,85,247,.3); border-radius:99px; padding:.3rem .8rem; font-size:.82rem; font-weight:700; margin-top:.5rem; }
+
+        /* Price summary row */
+        .price-row { display:flex; justify-content:space-between; align-items:center; margin:1rem 0; }
+
+        /* Main button */
+        .necro-btn-primary { background:var(--clr-necro-accent); color:#fff; border:none; }
+        .necro-btn-primary:hover { background:var(--clr-necro-accent-dark); transform:translateY(-2px); box-shadow:0 10px 15px -3px rgba(168,85,247,.35); }
+
+        /* Modal */
+        .necro-modal { position:fixed; inset:0; background:rgba(9,9,11,.88); z-index:3000; display:flex; align-items:center; justify-content:center; padding:1rem; }
+        .necro-modal.hidden { display:none; }
+        .necro-modal-box { background:var(--clr-necro-card); border:2px solid var(--clr-necro-accent); border-radius:var(--border-radius-lg); width:90%; max-width:460px; padding:2.5rem; text-align:center; }
+        .spinner-necro { display:inline-block; width:48px; height:48px; border:4px solid rgba(255,255,255,.1); border-radius:50%; border-top-color:var(--clr-necro-accent); animation:spin 1s ease-in-out infinite; margin-bottom:1rem; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        /* Lookup section */
+        .lookup-card { background:var(--clr-necro-card); border:1px solid #27272a; border-radius:var(--border-radius-lg); padding:2rem; }
+        .lookup-result { background:#09090b; border:1px solid #27272a; border-radius: var(--border-radius-sm); padding:1.25rem; margin-top:1.25rem; }
+        .status-pill { display:inline-flex; align-items:center; gap:.35rem; padding:.3rem .8rem; border-radius:99px; font-weight:700; font-size:.82rem; }
+        .status-pill.aceptada { background:rgba(16,185,129,.15); color:#6ee7b7; border:1px solid rgba(16,185,129,.3); }
+        .status-pill.pendiente { background:rgba(249,115,22,.15); color:#fdba74; border:1px solid rgba(249,115,22,.3); }
+        .status-pill.rechazada { background:rgba(239,68,68,.15); color:#fca5a5; border:1px solid rgba(239,68,68,.3); }
+
+        /* Responsive */
+        @media(max-width:768px) {
+            .necro-booking-grid { grid-template-columns:1fr !important; gap:2rem !important; }
+            .necro-occ-stats { grid-template-columns:repeat(3,1fr); }
+        }
+
+        /* Include include box */
+        .include-list { list-style:none; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.6rem; }
+        .include-list li { display:flex; align-items:center; gap:.6rem; color:#d4d4d8; font-size:.95rem; }
+        .include-list li i { color:var(--clr-necro-accent); font-size:1.15rem; flex-shrink:0; }
+    </style>
+</head>
+<body>
+
+<!-- ========================= NAVBAR ========================= -->
+<nav class="navbar">
+    <div class="container nav-container">
+        <a href="./index.html" class="logo" style="color:var(--clr-necro-accent);">
+            <i class="ph-fill ph-ghost" style="color:var(--clr-necro-accent);"></i>
+            <span>NecroCaranavi</span>
+        </a>
+        <div class="nav-links" style="gap:1.5rem;">
+            <a href="./index.html">Transporte Regular</a>
+            <a href="#planes">Planes</a>
+            <a href="#tarifas">Tarifas</a>
+            <a href="#reserva-necro" class="btn necro-btn-primary">Reservar Tour</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ========================= HERO ========================= -->
+<header class="necro-hero">
+    <div class="container hero-content" style="position:relative;z-index:2;">
+        <span class="badge necro-kicker">Turismo Cultural · Patrimonio · Misterio</span>
+        <h1 class="necro-title">Memorias y Leyendas<br>de Caranavi</h1>
+        <p style="color:#a1a1aa; max-width:620px; font-size:1.05rem; margin-bottom:.5rem;">
+            Una experiencia entre historia, cultura y misterio en el corazón de los Yungas de La Paz. Descubre la historia que descansa entre tumbas y leyendas, siempre desde el respeto hacia la cultura, la memoria y el patrimonio.
+        </p>
+        <p style="color:var(--clr-necro-accent); font-weight:700; font-size:.95rem; margin-bottom:2rem;">
+            <i class="ph ph-map-pin"></i> Punto de encuentro: Plaza Principal de Caranavi
+        </p>
+        <div class="hero-actions">
+            <a href="#reserva-necro" class="btn necro-btn-primary btn-lg">
+                <i class="ph ph-ticket"></i> Reservar mi Lugar
+            </a>
+            <a href="#planes" class="btn btn-outline btn-lg" style="border-color:var(--clr-necro-accent);color:var(--clr-necro-accent);">
+                <i class="ph ph-video-camera"></i> Ver los Tours
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- ========================= PLANES Y VIDEOS ========================= -->
+<section id="planes" class="necro-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 style="color:var(--clr-necro-accent);">Nuestros Planes de Tour</h2>
+            <p style="color:var(--clr-necro-muted);">Elige el recorrido que mejor se adapte a tu experiencia deseada.</p>
+        </div>
+
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:2.5rem;margin-bottom:4rem;">
+            <!-- DIURNO -->
+            <div class="necro-card overflow-hidden" style="overflow:hidden;">
+                <div class="video-box">
+                    <video controls poster="./caranavi.png">
+                        <source src="./necrodiurno.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div style="padding:2rem;">
+                    <span class="necro-label">☀️ Tour Diurno · 08:00 – 17:00</span>
+                    <h3 style="font-size:1.5rem;margin-bottom:.5rem;">Plan Necro Diurno</h3>
+                    <div style="display:flex;gap:1rem;align-items:baseline;margin-bottom:1.25rem;flex-wrap:wrap;">
+                        <div class="plan-price-big">180 Bs. <span>/ nacional</span></div>
+                        <div style="font-size:1.4rem;font-weight:700;color:#c084fc;">250 Bs. <span style="font-size:.9rem;color:var(--clr-necro-muted);font-weight:500;">/ extranjero</span></div>
+                    </div>
+                    <p style="color:var(--clr-necro-muted);margin-bottom:1.5rem;line-height:1.7;">
+                        Una experiencia enfocada en la historia y el patrimonio funerario. Durante el recorrido conocerás aspectos relacionados con la <strong style="color:#e4e4e7;">arquitectura funeraria y personajes destacados</strong>, acompañados por un guía especializado con información e interpretación sobre los espacios visitados. Ideal para quienes desean aprender sobre el patrimonio cultural de Caranavi.
+                    </p>
+                    <ul class="features-list" style="margin-bottom:1.5rem;">
+                        <li style="color:#d4d4d8;"><i class="ph ph-clock" style="color:var(--clr-necro-accent);"></i> Duración: 9 horas (08:00 – 17:00)</li>
+                        <li style="color:#d4d4d8;"><i class="ph ph-book-open" style="color:var(--clr-necro-accent);"></i> Enfoque: historia, patrimonio y cultura</li>
+                        <li style="color:#d4d4d8;"><i class="ph ph-sneaker" style="color:var(--clr-necro-accent);"></i> Ropa cómoda y calzado cerrado</li>
+                    </ul>
+                    <button class="btn necro-btn-primary w-100" onclick="selectPlan('diurno')">Elegir Plan Diurno</button>
+                </div>
+            </div>
+
+            <!-- NOCTURNO -->
+            <div class="necro-card" style="overflow:hidden;">
+                <div class="video-box">
+                    <video controls poster="./caranavi.png">
+                        <source src="./necronoche.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div style="padding:2rem;">
+                    <span class="necro-label">🌙 Tour Nocturno · 18:00 – 22:00</span>
+                    <h3 style="font-size:1.5rem;margin-bottom:.5rem;">Plan Necro Nocturno</h3>
+                    <div style="display:flex;gap:1rem;align-items:baseline;margin-bottom:1.25rem;flex-wrap:wrap;">
+                        <div class="plan-price-big">180 Bs. <span>/ nacional</span></div>
+                        <div style="font-size:1.4rem;font-weight:700;color:#c084fc;">250 Bs. <span style="font-size:.9rem;color:var(--clr-necro-muted);font-weight:500;">/ extranjero</span></div>
+                    </div>
+                    <p style="color:var(--clr-necro-muted);margin-bottom:1.5rem;line-height:1.7;">
+                        Cuando llega la noche comienza una experiencia diferente. El recorrido nocturno está dedicado a descubrir <strong style="color:#e4e4e7;">relatos de leyendas, mitos y hechos históricos</strong>, narrados bajo la luz de la noche. Ideal para quienes desean conocer las tradiciones de Caranavi desde una perspectiva que combina cultura, memoria, misterio y narración.
+                    </p>
+                    <ul class="features-list" style="margin-bottom:1.5rem;">
+                        <li style="color:#d4d4d8;"><i class="ph ph-moon" style="color:var(--clr-necro-accent);"></i> Duración: 4 horas (18:00 – 22:00)</li>
+                        <li style="color:#d4d4d8;"><i class="ph ph-flashlight" style="color:var(--clr-necro-accent);"></i> Llevar linterna personal</li>
+                        <li style="color:#d4d4d8;"><i class="ph ph-fire" style="color:var(--clr-necro-accent);"></i> Narración mística nocturna</li>
+                    </ul>
+                    <button class="btn necro-btn-primary w-100" onclick="selectPlan('nocturno')">Elegir Plan Nocturno</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Qué incluye -->
+        <hr class="necro-divider">
+        <h3 style="text-align:center;margin-bottom:2rem;font-size:1.5rem;"><i class="ph ph-backpack" style="color:var(--clr-necro-accent);"></i> El paquete incluye</h3>
+        <ul class="include-list" style="max-width:900px;margin:0 auto 4rem;">
+            <li><i class="ph-fill ph-van"></i> Transporte turístico</li>
+            <li><i class="ph-fill ph-user-circle-gear"></i> Guía especializado</li>
+            <li><i class="ph-fill ph-door-open"></i> Ingreso al cementerio</li>
+            <li><i class="ph-fill ph-map-trifold"></i> Recorrido interpretativo</li>
+            <li><i class="ph-fill ph-cup"></i> Refrigerio</li>
+            <li><i class="ph-fill ph-drop"></i> Botella de agua</li>
+            <li><i class="ph-fill ph-shield-check"></i> Seguro básico de viaje</li>
+            <li><i class="ph-fill ph-newspaper"></i> Material informativo</li>
+        </ul>
+
+        <!-- Complementa + Recomendaciones -->
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:2rem;">
+            <div class="necro-card" style="padding:2rem;">
+                <h4 style="margin-bottom:1rem;color:var(--clr-necro-accent);"><i class="ph ph-coffee"></i> Complementa tu experiencia</h4>
+                <p style="color:var(--clr-necro-muted);line-height:1.7;">Después de descubrir la historia y las leyendas de Caranavi, puedes complementar tu visita con una experiencia en <strong style="color:#e4e4e7;">fincas cafetaleras</strong> y disfrutar del café producido en el corazón de los Yungas.</p>
+            </div>
+            <div class="necro-card" style="padding:2rem;">
+                <h4 style="margin-bottom:1rem;color:var(--clr-necro-accent);"><i class="ph ph-warning-circle"></i> Recomendaciones</h4>
+                <ul style="list-style:none;color:var(--clr-necro-muted);line-height:1.8;">
+                    <li>• Ropa cómoda y calzado cerrado</li>
+                    <li>• Llevar linterna (tour nocturno)</li>
+                    <li>• Actitud respetuosa en todo momento</li>
+                    <li>• No dañar monumentos ni dejar basura</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================= BANNER / TARIFAS ========================= -->
+<section id="tarifas" class="necro-section-alt">
+    <div class="container">
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:3rem;align-items:center;">
+            <div>
+                <span class="necro-label">💰 Tarifas Referenciales</span>
+                <h2 style="font-size:2.2rem;margin-bottom:1.5rem;">Costos del Paquete Oficial</h2>
+                <div style="display:flex;flex-direction:column;gap:1rem;margin-bottom:1.5rem;">
+                    <div class="necro-card" style="padding:1.25rem;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <span style="font-size:.78rem;color:var(--clr-necro-muted);text-transform:uppercase;font-weight:700;">Turista Nacional</span>
+                            <div style="font-size:1.8rem;font-weight:800;color:var(--clr-necro-accent);">Bs. 180</div>
+                        </div>
+                        <i class="ph ph-identification-card" style="font-size:2.5rem;color:rgba(168,85,247,.3);"></i>
+                    </div>
+                    <div class="necro-card" style="padding:1.25rem;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <span style="font-size:.78rem;color:var(--clr-necro-muted);text-transform:uppercase;font-weight:700;">Turista Extranjero</span>
+                            <div style="font-size:1.8rem;font-weight:800;color:#c084fc;">Bs. 250</div>
+                        </div>
+                        <i class="ph ph-globe" style="font-size:2.5rem;color:rgba(192,132,252,.3);"></i>
+                    </div>
+                    <div class="necro-card" style="padding:1.25rem;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <span style="font-size:.78rem;color:var(--clr-necro-muted);text-transform:uppercase;font-weight:700;">Grupos +10 personas</span>
+                            <div style="font-size:1.5rem;font-weight:800;color:#86efac;">10% de Descuento</div>
+                        </div>
+                        <i class="ph ph-users-four" style="font-size:2.5rem;color:rgba(134,239,172,.3);"></i>
+                    </div>
+                </div>
+                <p style="color:var(--clr-necro-muted);font-style:italic;font-size:.9rem;margin-bottom:1.5rem;">Historia, misterio y café en el corazón de los Yungas. <strong style="color:#e4e4e7;">Turismo que respeta, cultura que perdura.</strong></p>
+                <a href="#reserva-necro" class="btn necro-btn-primary btn-lg"><i class="ph ph-ticket"></i> Reservar mi Experiencia</a>
+            </div>
+            <div style="text-align:center;">
+                <img src="./bannernecro.jpeg" alt="Banner Oficial Necro Turismo Caranavi" style="width:100%;max-width:460px;border-radius:var(--border-radius-lg);border:3px solid var(--clr-necro-accent);box-shadow:0 20px 40px rgba(0,0,0,.6);">
+                <span style="font-size:.8rem;color:var(--clr-necro-muted);display:block;margin-top:.75rem;font-style:italic;"><i class="ph ph-info"></i> Banner oficial de precios y horarios del Necro Turismo en Caranavi.</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================= RESERVA ========================= -->
+<section id="reserva-necro" class="necro-section" style="background:linear-gradient(135deg,#1e1b4b 0%,#09090b 100%);border-top:1px solid #27272a;">
+    <div class="container">
+        <div class="section-header">
+            <h2 style="color:var(--clr-necro-accent);">Reserva tu Experiencia</h2>
+            <p style="color:var(--clr-necro-muted);">Completa el formulario y recibirás tu ticket PDF directamente. Sin necesidad de WhatsApp.</p>
+        </div>
+
+        <div class="grid necro-booking-grid" style="grid-template-columns:1fr 1.25fr;gap:3.5rem;align-items:flex-start;">
+            <!-- LEFT: Info + Occupancy -->
+            <div>
+                <span class="booking-kicker necro-kicker" style="margin-bottom:1rem;display:inline-flex;">Reservación Segura Offline PWA</span>
+                <p style="color:var(--clr-necro-muted);margin-bottom:1.5rem;line-height:1.7;">Ingresa la fecha del tour, selecciona el plan, registra los datos de cada asistente y confirma el método de pago. Al finalizar recibirás tu <strong style="color:#e4e4e7;">ticket PDF de reserva</strong> al instante.</p>
+
+                <!-- Occupancy box (real-time) -->
+                <div class="necro-occ-box">
+                    <h4><i class="ph ph-chart-bar"></i> Ocupación del Tour Seleccionado</h4>
+                    <div class="necro-occ-stats">
+                        <div class="necro-occ-stat">
+                            <span class="label">Capacidad</span>
+                            <span class="val" id="nOccCapacity">20</span>
+                        </div>
+                        <div class="necro-occ-stat">
+                            <span class="label">Reservados</span>
+                            <span class="val" id="nOccBooked">0</span>
+                        </div>
+                        <div class="necro-occ-stat" style="background:rgba(134,239,172,.08);border-color:rgba(134,239,172,.2);">
+                            <span class="label">Disponibles</span>
+                            <span class="val" style="color:#86efac;" id="nOccFree">20</span>
+                        </div>
+                    </div>
+                    <div class="necro-progress-bar">
+                        <div class="necro-progress-fill" id="nOccBar" style="width:0%;"></div>
+                    </div>
+                    <p id="nOccHint" style="font-size:.85rem;color:var(--clr-necro-muted);margin-top:.6rem;"></p>
+                </div>
+
+                <div style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:var(--border-radius-sm);padding:1rem;font-size:.9rem;color:#c4b5fd;">
+                    <i class="ph ph-map-pin"></i> <strong>Punto de encuentro:</strong> Plaza Principal de Caranavi<br>
+                    <i class="ph ph-warning-circle"></i> Cupos limitados: <strong>máx. 20 personas por grupo</strong>
+                </div>
+            </div>
+
+            <!-- RIGHT: Wizard Form -->
+            <div class="necro-form-card">
+                <form id="necroForm">
+                    <!-- Stepper -->
+                    <div class="booking-stepper" style="grid-template-columns:repeat(3,1fr);margin-bottom:2rem;">
+                        <button type="button" class="step-pill active" data-step-indicator="1"><span>1</span> Tour</button>
+                        <button type="button" class="step-pill" data-step-indicator="2"><span>2</span> Personas</button>
+                        <button type="button" class="step-pill" data-step-indicator="3"><span>3</span> Pago</button>
+                    </div>
+
+                    <!-- STEP 1 -->
+                    <section class="booking-step active" data-step="1">
+                        <div class="step-heading">
+                            <span style="color:var(--clr-necro-accent);">Paso 1</span>
+                            <h3>Fecha y Plan</h3>
+                        </div>
+                        <div class="form-group">
+                            <label for="nFecha"><i class="ph ph-calendar-blank"></i> Fecha del Tour</label>
+                            <input type="date" id="nFecha" required>
+                            <small id="nFechaAviso" class="text-error hidden"></small>
+                        </div>
+                        <label style="margin-bottom:.75rem;"><i class="ph ph-ghost"></i> Selecciona el Plan</label>
+                        <div class="grid" style="grid-template-columns:repeat(2,1fr);gap:.85rem;margin-bottom:1.5rem;">
+                            <button type="button" class="plan-choice" data-plan="diurno">
+                                <i class="ph ph-sun"></i>
+                                <strong>Necro Diurno</strong>
+                                <span>08:00 – 17:00</span>
+                            </button>
+                            <button type="button" class="plan-choice active" data-plan="nocturno">
+                                <i class="ph ph-moon"></i>
+                                <strong>Necro Nocturno</strong>
+                                <span>18:00 – 22:00</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="nPlan" value="nocturno">
+                        <div class="passenger-counter">
+                            <label for="nPaxCount"><i class="ph ph-users"></i> Número de personas</label>
+                            <div class="counter-control">
+                                <button type="button" id="nDec"><i class="ph ph-minus"></i></button>
+                                <input type="number" id="nPaxCount" min="1" max="20" value="1">
+                                <button type="button" id="nInc"><i class="ph ph-plus"></i></button>
+                            </div>
+                            <small id="nGroupDiscount" class="hidden" style="color:#86efac;font-weight:700;margin-top:.5rem;display:block;"><i class="ph ph-tag"></i> ¡Descuento de grupo 10% aplicado automáticamente!</small>
+                        </div>
+                    </section>
+
+                    <!-- STEP 2 -->
+                    <section class="booking-step" data-step="2">
+                        <div class="step-heading">
+                            <span style="color:var(--clr-necro-accent);">Paso 2</span>
+                            <h3>Datos de Asistentes</h3>
+                        </div>
+                        <div id="nPaxForms" style="max-height:620px;overflow-y:auto;padding-right:.25rem;"></div>
+                    </section>
+
+                    <!-- STEP 3 -->
+                    <section class="booking-step" data-step="3">
+                        <div class="step-heading">
+                            <span style="color:var(--clr-necro-accent);">Paso 3</span>
+                            <h3>Pago y Confirmación</h3>
+                        </div>
+                        <div id="nOrderSummary" class="necro-order-summary" style="margin-bottom:1.5rem;"></div>
+
+                        <div style="border-top:1px solid #27272a;padding-top:1.5rem;margin-bottom:1rem;">
+                            <label><i class="ph ph-credit-card"></i> Método de Pago</label>
+                            <div class="payment-options" style="margin-bottom:1rem;">
+                                <div class="necro-pay-opt active" data-method="qr">
+                                    <input type="radio" name="nPayMethod" id="nQR" checked>
+                                    <label for="nQR"><i class="ph ph-qr-code"></i><span>Pago QR</span></label>
+                                </div>
+                                <div class="necro-pay-opt" data-method="tarjeta">
+                                    <input type="radio" name="nPayMethod" id="nCard">
+                                    <label for="nCard"><i class="ph ph-credit-card"></i><span>Tarjeta</span></label>
+                                </div>
+                                <div class="necro-pay-opt" data-method="efectivo">
+                                    <input type="radio" name="nPayMethod" id="nCash">
+                                    <label for="nCash"><i class="ph ph-money"></i><span>Efectivo</span></label>
+                                </div>
+                            </div>
+
+                            <!-- QR box -->
+                            <div id="nPayBoxQR" class="necro-pay-box">
+                                <div class="qr-container" style="gap:1.25rem;flex-wrap:wrap;justify-content:center;text-align:center;">
+                                    <div class="qr-image-box"><img src="./qr.jpeg" alt="QR de Pago"></div>
+                                    <div style="flex:1;min-width:200px;">
+                                        <h5 style="color:#e4e4e7;margin-bottom:.4rem;">Escanear QR de Pago</h5>
+                                        <p style="color:var(--clr-necro-muted);font-size:.85rem;margin-bottom:1rem;">Realiza la transferencia y <strong style="color:#e4e4e7;">adjunta la foto del comprobante</strong> para que el administrador valide tu pago.</p>
+                                        <div class="receipt-upload" id="receiptDropZone" onclick="document.getElementById('nReceiptFile').click()">
+                                            <i class="ph ph-upload-simple" style="font-size:2rem;color:var(--clr-necro-accent);"></i>
+                                            <p style="color:var(--clr-necro-muted);margin-top:.5rem;font-size:.88rem;">Toca para adjuntar tu comprobante de pago</p>
+                                            <input type="file" id="nReceiptFile" accept="image/*" capture="environment">
+                                        </div>
+                                        <img id="nReceiptPreview" class="receipt-preview" alt="Vista previa del comprobante">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card box -->
+                            <div id="nPayBoxCard" class="necro-pay-box hidden">
+                                <div class="form-group">
+                                    <label for="nCardNum">Número de Tarjeta</label>
+                                    <input type="text" id="nCardNum" placeholder="4000 1234 5678 9010" maxlength="19">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group"><label for="nCardExp">Vencimiento</label><input type="text" id="nCardExp" placeholder="MM/AA" maxlength="5"></div>
+                                    <div class="form-group"><label for="nCardCVV">CVV</label><input type="password" id="nCardCVV" placeholder="123" maxlength="3"></div>
+                                </div>
+                            </div>
+
+                            <!-- Cash box -->
+                            <div id="nPayBoxCash" class="necro-pay-box hidden">
+                                <p style="color:var(--clr-necro-muted);"><i class="ph ph-info"></i> El pago en efectivo se coordinará con el guía en el punto de encuentro: <strong style="color:#e4e4e7;">Plaza Principal de Caranavi</strong>.</p>
+                            </div>
+                        </div>
+
+                        <div class="price-row">
+                            <span style="color:var(--clr-necro-muted);">Monto Total:</span>
+                            <h3 id="nPrecioTotal" style="color:var(--clr-necro-accent);font-size:2rem;">180 Bs.</h3>
+                        </div>
+                        <div id="nDiscountRow" class="hidden" style="display:flex;justify-content:space-between;margin-bottom:.75rem;">
+                            <span style="color:#86efac;font-size:.88rem;"><i class="ph ph-tag"></i> Descuento 10% por grupo</span>
+                            <span id="nDiscountAmt" style="color:#86efac;font-weight:700;"></span>
+                        </div>
+
+                        <button type="submit" class="btn necro-btn-primary w-100 btn-lg" id="nSubmitBtn">
+                            <i class="ph ph-download-simple"></i> Confirmar y Descargar Ticket PDF
+                        </button>
+                    </section>
+
+                    <!-- Wizard nav -->
+                    <div class="booking-actions" style="margin-top:1.5rem;">
+                        <button type="button" class="btn btn-outline" id="nPrevBtn" style="border-color:#27272a;color:#a1a1aa;"><i class="ph ph-arrow-left"></i> Atrás</button>
+                        <button type="button" class="btn btn-outline" id="nClearBtn" style="border-color:#27272a;color:#a1a1aa;"><i class="ph ph-broom"></i> Limpiar</button>
+                        <button type="button" class="btn necro-btn-primary" id="nNextBtn">Siguiente <i class="ph ph-arrow-right"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================= CONSULTA RESERVA ========================= -->
+<section class="necro-section-alt" id="consultar">
+    <div class="container" style="max-width:680px;">
+        <div class="section-header">
+            <h2 style="color:var(--clr-necro-accent);">Consultar mi Reserva</h2>
+            <p style="color:var(--clr-necro-muted);">Ingresa tu código de reserva (ej: <code style="background:#18181b;padding:.1rem .4rem;border-radius:4px;">NC-4820</code>) o tu número de C.I. para verificar el estado y descargar tu ticket.</p>
+        </div>
+        <div class="lookup-card">
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                <input type="text" id="nLookupInput" placeholder="Código NC-XXXX o número de C.I." style="flex:1;min-width:200px;background:#09090b;border-color:#27272a;color:var(--clr-necro-text);">
+                <button class="btn necro-btn-primary" id="nLookupBtn" style="white-space:nowrap;"><i class="ph ph-magnifying-glass"></i> Buscar</button>
+            </div>
+            <div id="nLookupResult" class="hidden"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ========================= FOOTER ========================= -->
+<footer class="footer" style="background:#09090b;border-top:1px solid #27272a;margin-top:0;">
+    <div class="container footer-content">
+        <div class="footer-brand">
+            <h3 style="color:var(--clr-necro-accent);">Necroturismo Caranavi</h3>
+            <p style="color:var(--clr-necro-muted);">"Memorias y Leyendas de Caranavi" — Turismo que respeta, cultura que perdura.</p>
+        </div>
+        <div class="footer-links">
+            <h4>Explorar</h4>
+            <a href="#planes" style="color:var(--clr-necro-muted);">Planes</a>
+            <a href="#tarifas" style="color:var(--clr-necro-muted);">Tarifas</a>
+            <a href="#reserva-necro" style="color:var(--clr-necro-muted);">Reservar</a>
+            <a href="#consultar" style="color:var(--clr-necro-muted);">Consultar</a>
+            <a href="./index.html" style="color:var(--clr-necro-muted);">Transporte Regular</a>
+            <a href="./admin.html" style="color:var(--clr-necro-muted);">Panel Admin</a>
+        </div>
+        <div class="footer-contact">
+            <h4>Punto de Encuentro</h4>
+            <p style="color:var(--clr-necro-muted);"><i class="ph ph-map-pin"></i> Plaza Principal de Caranavi</p>
+            <p style="color:var(--clr-necro-muted);"><i class="ph ph-phone"></i> +591 75223813</p>
+        </div>
+    </div>
+    <div class="footer-bottom" style="border-top:1px solid #27272a;">
+        <p style="color:var(--clr-necro-muted);">&copy; 2026 Necroturismo Caranavi · Desarrollado con tecnología PWA.</p>
+    </div>
+</footer>
+
+<!-- ========================= SUCCESS MODAL ========================= -->
+<div id="nSuccessModal" class="necro-modal hidden">
+    <div class="necro-modal-box">
+        <div id="nLoadingState">
+            <div class="spinner-necro"></div>
+            <h3 style="margin-bottom:.5rem;">Procesando Pago...</h3>
+            <p style="color:var(--clr-necro-muted);font-size:.9rem;">Validando conexión con la red bancaria.</p>
+        </div>
+        <div id="nSuccessState" class="hidden">
+            <i class="ph ph-check-circle" style="font-size:5rem;color:#10b981;display:block;margin:0 auto 1rem;"></i>
+            <h3 id="nSuccessTitle" style="margin-bottom:.5rem;font-size:1.4rem;">¡Reserva Registrada!</h3>
+            <p id="nSuccessMsg" style="color:var(--clr-necro-muted);font-size:.9rem;margin-bottom:.5rem;"></p>
+            <div id="nCodeDisplay" style="background:#09090b;border:1px solid var(--clr-necro-accent);border-radius:8px;padding:.75rem 1rem;margin-bottom:1.5rem;font-size:1.2rem;font-weight:800;color:var(--clr-necro-accent);"></div>
+            <div style="display:flex;flex-direction:column;gap:.75rem;">
+                <button class="btn necro-btn-primary w-100" id="nBtnPDF"><i class="ph ph-download-simple"></i> Descargar Ticket PDF</button>
+                <button class="btn btn-outline w-100" id="nBtnWA" style="border-color:var(--clr-necro-accent);color:var(--clr-necro-accent);"><i class="ph ph-whatsapp-logo"></i> Enviar por WhatsApp (opcional)</button>
+                <button class="btn btn-outline w-100" id="nBtnClose" style="border-color:#27272a;color:#a1a1aa;">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="./db.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const PLANS_CFG = {
+        diurno: { label: 'Necro Diurno', time: '08:00 – 17:00', priceNational: 180, priceForeign: 250 },
+        nocturno: { label: 'Necro Nocturno', time: '18:00 – 22:00', priceNational: 180, priceForeign: 250 }
+    };
+    const MAX_CAPACITY = 20;
+    const businessWA = '59175223813';
+
+    const state = { step: 1, plan: 'nocturno', passengers: 1, payment: 'qr', receiptBase64: '', savedRecord: null };
+
+    /* ---- DOM refs ---- */
+    const form       = document.getElementById('necroForm');
+    const nFecha     = document.getElementById('nFecha');
+    const nPlan      = document.getElementById('nPlan');
+    const nPaxCount  = document.getElementById('nPaxCount');
+    const nPaxForms  = document.getElementById('nPaxForms');
+    const nNextBtn   = document.getElementById('nNextBtn');
+    const nPrevBtn   = document.getElementById('nPrevBtn');
+    const nClearBtn  = document.getElementById('nClearBtn');
+    const nIncBtn    = document.getElementById('nInc');
+    const nDecBtn    = document.getElementById('nDec');
+    const nGroupDisc = document.getElementById('nGroupDiscount');
+    const nReceiptFile = document.getElementById('nReceiptFile');
+    const nReceiptPreview = document.getElementById('nReceiptPreview');
+    const payBoxQR   = document.getElementById('nPayBoxQR');
+    const payBoxCard = document.getElementById('nPayBoxCard');
+    const payBoxCash = document.getElementById('nPayBoxCash');
+    const successModal = document.getElementById('nSuccessModal');
+    const loadingState = document.getElementById('nLoadingState');
+    const successState = document.getElementById('nSuccessState');
+
+    /* ---- Date init ---- */
+    const today = new Date();
+    const yyyy = today.getFullYear(), mm = String(today.getMonth()+1).padStart(2,'0'), dd = String(today.getDate()).padStart(2,'0');
+    nFecha.min = `${yyyy}-${mm}-${dd}`;
+    nFecha.value = `${yyyy}-${mm}-${dd}`;
+
+    /* ============ PLAN SELECTION ============ */
+    function selectPlan(planKey) {
+        state.plan = planKey;
+        nPlan.value = planKey;
+        document.querySelectorAll('.plan-choice').forEach(c => c.classList.toggle('active', c.dataset.plan === planKey));
+        updateOccupancy();
+        renderAll();
+    }
+    window.selectPlan = selectPlan;
+    document.querySelectorAll('.plan-choice').forEach(c => c.addEventListener('click', () => selectPlan(c.dataset.plan)));
+
+    /* ============ PASSENGER COUNT ============ */
+    function setCount(n) {
+        state.passengers = Math.max(1, Math.min(Number(n)||1, MAX_CAPACITY));
+        nPaxCount.value = state.passengers;
+        nGroupDisc.classList.toggle('hidden', state.passengers <= 10);
+        renderAll();
+    }
+    nIncBtn.addEventListener('click', () => setCount(state.passengers + 1));
+    nDecBtn.addEventListener('click', () => setCount(state.passengers - 1));
+    nPaxCount.addEventListener('input', () => setCount(nPaxCount.value));
+
+    /* ============ OCCUPANCY ============ */
+    function updateOccupancy() {
+        if (!window.YaraDB) return;
+        const date = nFecha.value || `${yyyy}-${mm}-${dd}`;
+        const booked = window.YaraDB.getReservations().filter(r =>
+            r.type === 'Necro Turismo' &&
+            r.date === date &&
+            r.tourPlan === state.plan &&
+            r.status !== 'Rechazada'
+        ).reduce((acc, r) => acc + (r.passengers ? r.passengers.length : 0), 0);
+
+        const free = Math.max(0, MAX_CAPACITY - booked);
+        const pct = Math.min(100, (booked / MAX_CAPACITY) * 100);
+        document.getElementById('nOccBooked').textContent = booked;
+        document.getElementById('nOccFree').textContent = free;
+        const bar = document.getElementById('nOccBar');
+        bar.style.width = `${pct}%`;
+        bar.style.backgroundColor = pct >= 90 ? '#ef4444' : '#a855f7';
+        document.getElementById('nOccHint').textContent = `${free} cupo${free !== 1 ? 's' : ''} disponible${free !== 1 ? 's' : ''} para el ${state.plan === 'diurno' ? 'Tour Diurno' : 'Tour Nocturno'} del ${date}.`;
+    }
+
+    /* ============ TOTALS ============ */
+    function calcTotal() {
+        const cfg = PLANS_CFG[state.plan];
+        const passengers = collectPassengerData();
+        let baseTotal = passengers.reduce((acc, p) => {
+            const price = p.touristType === 'extranjero' ? cfg.priceForeign : cfg.priceNational;
+            return acc + price;
+        }, 0);
+        if (state.passengers > 0 && passengers.length === 0) baseTotal = cfg.priceNational * state.passengers;
+        const isGroup = state.passengers > 10;
+        const discount = isGroup ? Math.round(baseTotal * 0.1) : 0;
+        const final = baseTotal - discount;
+        return { baseTotal, discount, final };
+    }
+
+    /* ============ RENDER PASSENGER FORMS ============ */
+    function collectPassengerData() {
+        return Array.from({ length: state.passengers }, (_, i) => ({
+            name: document.getElementById(`nName-${i}`)?.value.trim() || '',
+            phone: document.getElementById(`nPhone-${i}`)?.value.trim() || '',
+            document: document.getElementById(`nDoc-${i}`)?.value.trim() || '',
+            touristType: document.getElementById(`nType-${i}`)?.value || 'nacional'
+        }));
+    }
+
+    function esc(v){ return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    function renderPassengerForms() {
+        const existing = collectPassengerData();
+        nPaxForms.innerHTML = Array.from({ length: state.passengers }, (_, i) => {
+            const p = existing[i] || {};
+            const label = i === 0 ? 'Titular' : `Asistente ${i+1}`;
+            return `
+            <div class="necro-pax-card">
+                <h4><i class="ph ph-user-circle"></i> ${label}</h4>
+                <div class="form-group" style="margin-bottom:.85rem;">
+                    <label for="nName-${i}">Nombre completo</label>
+                    <input type="text" id="nName-${i}" value="${esc(p.name)}" placeholder="Ej. Juan Pérez" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label for="nPhone-${i}">Celular / WhatsApp</label>
+                        <input type="tel" id="nPhone-${i}" value="${esc(p.phone)}" placeholder="75223813" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label for="nDoc-${i}">C.I. / Pasaporte</label>
+                        <input type="text" id="nDoc-${i}" value="${esc(p.document)}" placeholder="1234567 LP" required>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0;margin-top:.85rem;">
+                    <label for="nType-${i}"><i class="ph ph-globe"></i> Tipo de turista</label>
+                    <select id="nType-${i}" onchange="renderPriceSummary()">
+                        <option value="nacional" ${p.touristType==='nacional'?'selected':''}>Nacional — Bs. ${PLANS_CFG[state.plan].priceNational}</option>
+                        <option value="extranjero" ${p.touristType==='extranjero'?'selected':''}>Extranjero — Bs. ${PLANS_CFG[state.plan].priceForeign}</option>
+                    </select>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    /* ============ ORDER SUMMARY ============ */
+    function renderPriceSummary() {
+        const { baseTotal, discount, final } = calcTotal();
+        const nPrec = document.getElementById('nPrecioTotal');
+        const nDiscRow = document.getElementById('nDiscountRow');
+        const nDiscAmt = document.getElementById('nDiscountAmt');
+        if (nPrec) nPrec.textContent = `${final} Bs.`;
+        if (discount > 0) {
+            nDiscRow.classList.remove('hidden');
+            nDiscRow.style.display = 'flex';
+            nDiscAmt.textContent = `-${discount} Bs.`;
+        } else {
+            nDiscRow.classList.add('hidden');
+        }
+    }
+    window.renderPriceSummary = renderPriceSummary;
+
+    function renderOrderSummary() {
+        const cfg = PLANS_CFG[state.plan];
+        const passengers = collectPassengerData();
+        const { baseTotal, discount, final } = calcTotal();
+        const list = passengers.map((p, i) => {
+            const price = p.touristType === 'extranjero' ? cfg.priceForeign : cfg.priceNational;
+            return `<li><strong>${esc(p.name||`Asistente ${i+1}`)}</strong><span>${esc(p.touristType==='extranjero'?'Extranjero':'Nacional')} — ${price} Bs.</span></li>`;
+        }).join('');
+        const disc = discount > 0 ? `<li style="color:#86efac;"><strong><i class="ph ph-tag"></i> Descuento grupo 10%</strong><span>-${discount} Bs.</span></li>` : '';
+        document.getElementById('nOrderSummary').innerHTML = `
+            <div><span>Fecha</span><strong>${nFecha.value}</strong></div>
+            <div><span>Plan</span><strong>${cfg.label} (${cfg.time})</strong></div>
+            <div><span>Personas</span><strong>${state.passengers}</strong></div>
+            <div><span>Total</span><strong>${final} Bs.</strong></div>
+            <ul style="list-style:none;border-top:1px solid #27272a;padding-top:.75rem;margin-top:.5rem;">${list}${disc}</ul>`;
+        renderPriceSummary();
+    }
+
+    /* ============ STEPS ============ */
+    function renderSteps() {
+        document.querySelectorAll('.booking-step').forEach(s => s.classList.toggle('active', Number(s.dataset.step) === state.step));
+        document.querySelectorAll('[data-step-indicator]').forEach(pill => {
+            const n = Number(pill.dataset.stepIndicator);
+            pill.classList.toggle('active', n === state.step);
+            pill.classList.toggle('complete', n < state.step);
+        });
+        nPrevBtn.disabled = state.step === 1;
+        nNextBtn.classList.toggle('hidden', state.step === 3);
+        renderOrderSummary();
+    }
+
+    function renderAll() { renderPassengerForms(); renderSteps(); renderOrderSummary(); }
+
+    /* ============ VALIDATION ============ */
+    function validateStep(n) {
+        if (n === 1) {
+            if (!nFecha.value) { nFecha.focus(); return false; }
+            const avail = MAX_CAPACITY - window.YaraDB.getReservations().filter(r =>
+                r.type === 'Necro Turismo' && r.date === nFecha.value && r.tourPlan === state.plan && r.status !== 'Rechazada'
+            ).reduce((a,r) => a + r.passengers.length, 0);
+            if (state.passengers > avail) {
+                alert(`Solo quedan ${avail} cupos disponibles para este plan en la fecha seleccionada.`);
+                return false;
+            }
+        }
+        if (n === 2) {
+            const inputs = nPaxForms.querySelectorAll('input[required]');
+            for (const i of inputs) { if (!i.value.trim()) { i.focus(); return false; } }
+        }
+        return true;
+    }
+
+    /* ============ PAYMENT TOGGLE ============ */
+    document.querySelectorAll('.necro-pay-opt').forEach(opt => {
+        opt.addEventListener('click', () => {
+            state.payment = opt.dataset.method;
+            document.querySelectorAll('.necro-pay-opt').forEach(o => o.classList.remove('active'));
+            opt.classList.add('active');
+            const r = opt.querySelector('input[type="radio"]'); if (r) r.checked = true;
+            payBoxQR.classList.toggle('hidden', state.payment !== 'qr');
+            payBoxCard.classList.toggle('hidden', state.payment !== 'tarjeta');
+            payBoxCash.classList.toggle('hidden', state.payment !== 'efectivo');
+        });
+    });
+
+    /* ============ RECEIPT UPLOAD ============ */
+    nReceiptFile.addEventListener('change', () => {
+        const file = nReceiptFile.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            state.receiptBase64 = e.target.result;
+            nReceiptPreview.src = e.target.result;
+            nReceiptPreview.style.display = 'block';
+            document.getElementById('receiptDropZone').querySelector('p').textContent = '✓ Comprobante adjuntado correctamente';
+        };
+        reader.readAsDataURL(file);
+    });
+
+    /* ============ NAVIGATION ============ */
+    nNextBtn.addEventListener('click', () => {
+        if (!validateStep(state.step)) return;
+        state.step = Math.min(3, state.step + 1);
+        renderSteps();
+        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    nPrevBtn.addEventListener('click', () => { state.step = Math.max(1, state.step - 1); renderSteps(); });
+    nClearBtn.addEventListener('click', () => { state.step = 1; state.passengers = 1; nPaxCount.value = 1; selectPlan('nocturno'); });
+
+    /* ============ DATE CHANGE ============ */
+    nFecha.addEventListener('change', () => {
+        const day = new Date(`${nFecha.value}T12:00:00`).getDay();
+        const aviso = document.getElementById('nFechaAviso');
+        aviso.classList.toggle('hidden', day === 0 || day === 5 || day === 6);
+        aviso.textContent = 'Los tours regulares se realizan viernes, sábado y domingo.';
+        updateOccupancy();
+        renderAll();
+    });
+
+    /* ============ SUBMIT ============ */
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        if (!validateStep(1) || !validateStep(2)) return;
+        const passengers = collectPassengerData();
+        const { final } = calcTotal();
+        const record = {
+            type: 'Necro Turismo',
+            date: nFecha.value,
+            tourPlan: state.plan,
+            passengers,
+            total: `${final} Bs.`,
+            payment: state.payment,
+            paymentStatus: state.payment === 'tarjeta' ? 'Confirmado' : 'Pendiente',
+            status: state.payment === 'tarjeta' ? 'Aceptada' : 'Pendiente',
+            receiptImage: state.payment === 'qr' ? state.receiptBase64 : ''
+        };
+        state.savedRecord = window.YaraDB.saveReservation(record);
+        updateOccupancy();
+
+        // Show modal
+        successModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        const doSuccess = () => {
+            loadingState.classList.add('hidden');
+            successState.classList.remove('hidden');
+            const titleEl = document.getElementById('nSuccessTitle');
+            const msgEl = document.getElementById('nSuccessMsg');
+            const codeEl = document.getElementById('nCodeDisplay');
+            titleEl.textContent = state.payment === 'tarjeta' ? '¡Reserva Confirmada!' : '¡Reserva Registrada!';
+            msgEl.innerHTML = state.payment === 'tarjeta'
+                ? 'Tu pago fue validado. Descarga tu ticket oficial de confirmación.'
+                : 'Tu reserva está <strong>pendiente de validación de pago</strong>. Al ser aprobada podrás descargar el ticket definitivo en "Consultar Reserva".';
+            codeEl.textContent = `Código: ${state.savedRecord.code}`;
+        };
+
+        loadingState.classList.remove('hidden');
+        successState.classList.add('hidden');
+
+        if (state.payment === 'tarjeta') {
+            setTimeout(doSuccess, 2000);
+        } else {
+            setTimeout(doSuccess, 500);
+        }
+
+        // PDF button
+        document.getElementById('nBtnPDF').onclick = () => {
+            if (state.savedRecord && window.YaraDB.downloadPDF) {
+                window.YaraDB.downloadPDF(state.savedRecord.id);
+            }
+        };
+
+        // WA button
+        document.getElementById('nBtnWA').onclick = () => {
+            const cfg = PLANS_CFG[state.plan];
+            const lines = passengers.map((p,i) => `${i+1}. ${p.name} — CI: ${p.document} — Tel: ${p.phone} — ${p.touristType === 'extranjero' ? 'Extranjero' : 'Nacional'}`).join('\n');
+            const msg = `NECRO TURISMO CARANAVI\n"Memorias y Leyendas de Caranavi"\n\nCódigo: ${state.savedRecord.code}\nFecha: ${nFecha.value}\nPlan: ${cfg.label} (${cfg.time})\nPersonas: ${state.passengers}\nTotal: ${final} Bs.\nPago: ${state.payment.toUpperCase()} — ${state.savedRecord.paymentStatus}\n\nPunto de encuentro: Plaza Principal de Caranavi\n\nASISTENTES:\n${lines}\n\nPor favor confirmar mi reservación. Gracias.`;
+            window.open(`https://api.whatsapp.com/send?phone=${businessWA}&text=${encodeURIComponent(msg)}`, '_blank');
+        };
+
+        // Close button
+        document.getElementById('nBtnClose').onclick = () => {
+            successModal.classList.add('hidden');
+            document.body.style.overflow = '';
+            state.step = 1; state.passengers = 1; state.receiptBase64 = ''; state.savedRecord = null;
+            nPaxCount.value = 1;
+            nReceiptPreview.style.display = 'none';
+            selectPlan('nocturno');
+        };
+    });
+
+    /* ============ LOOKUP ============ */
+    document.getElementById('nLookupBtn').addEventListener('click', () => {
+        const q = document.getElementById('nLookupInput').value.trim();
+        const resultDiv = document.getElementById('nLookupResult');
+        if (!q) { resultDiv.classList.add('hidden'); return; }
+        const r = window.YaraDB.getReservationByCodeOrCI(q);
+        resultDiv.classList.remove('hidden');
+        if (!r) {
+            resultDiv.innerHTML = `<div class="lookup-result"><i class="ph ph-warning-circle" style="color:#f87171;"></i> No se encontró ninguna reserva con ese código o C.I.</div>`;
+            return;
+        }
+        const cfg = PLANS_CFG[r.tourPlan] || {};
+        const statusClass = r.status.toLowerCase();
+        const canDownload = r.status === 'Aceptada';
+        resultDiv.innerHTML = `
+        <div class="lookup-result">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem;">
+                <div>
+                    <div style="font-size:1.3rem;font-weight:800;color:var(--clr-necro-accent);">${r.code}</div>
+                    <div style="font-size:.88rem;color:var(--clr-necro-muted);">${r.type} · ${r.tourPlan ? (cfg.label || r.tourPlan) : ''}</div>
+                </div>
+                <span class="status-pill ${statusClass}"><i class="ph ${r.status==='Aceptada'?'ph-check-circle':r.status==='Rechazada'?'ph-x-circle':'ph-clock'}"></i> ${r.status}</span>
+            </div>
+            <div style="font-size:.9rem;color:#d4d4d8;margin-bottom:1rem;">
+                <p><i class="ph ph-calendar" style="color:var(--clr-necro-accent);"></i> <strong>Fecha:</strong> ${r.date}</p>
+                <p><i class="ph ph-credit-card" style="color:var(--clr-necro-accent);"></i> <strong>Pago:</strong> ${r.paymentStatus} · ${r.total}</p>
+            </div>
+            <ul style="list-style:none;border-top:1px solid #27272a;padding-top:.75rem;margin-bottom:1rem;">
+                ${r.passengers.map(p=>`<li style="color:#d4d4d8;font-size:.88rem;padding:.3rem 0;">• <strong>${p.name}</strong> — CI: ${p.document}</li>`).join('')}
+            </ul>
+            ${canDownload
+                ? `<button class="btn necro-btn-primary w-100" onclick="window.YaraDB.downloadPDF(${r.id})"><i class="ph ph-download-simple"></i> Descargar Ticket Confirmado</button>`
+                : `<div style="background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.3);border-radius:8px;padding:1rem;font-size:.88rem;color:#fdba74;"><i class="ph ph-info"></i> Tu reserva está <strong>${r.status}</strong>. El ticket definitivo se habilitará cuando el administrador confirme tu pago.</div>`}
+        </div>`;
+    });
+    document.getElementById('nLookupInput').addEventListener('keypress', e => { if(e.key === 'Enter') document.getElementById('nLookupBtn').click(); });
+
+    /* ============ INITIAL RENDER ============ */
+    updateOccupancy();
+    renderAll();
+});
+</script>
+</body>
+</html>
